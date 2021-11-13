@@ -33,7 +33,7 @@ class AuthController extends Controller
                     $data = [];
                     if ($user->role == 'Admin') {
                         $data = $user;
-                    } else if ($user->role == 'Guru'){
+                    } else if ($user->role == 'Guru') {
                         $guru = Guru::where('id_users', $user->id)->first();
                         $data['nama'] = $guru->nama;
                         $data['alamat'] = $guru->alamat;
@@ -43,7 +43,7 @@ class AuthController extends Controller
                         $data['role'] = $user->role;
                         $data['username'] = $user->username;
                         $data['status'] = $user->status;
-                    } else if ($user->role == 'Walimurid'){
+                    } else if ($user->role == 'Walimurid') {
                         $guru = Walimurid::where('id_users', $user->id)->first();
                         $data['nama'] = $guru->nama;
                         $data['alamat'] = $guru->alamat;
@@ -88,6 +88,17 @@ class AuthController extends Controller
         }
     }
 
+    public function logout(Request $request)
+    {
+       try {
+        auth()->user()->tokens()->delete();
+        return [
+            'message' => 'Logged out'
+        ];
+       } catch (\Throwable $th) {
+           //throw $th;
+       }
+    }
     public function index()
     {
         //
