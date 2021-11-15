@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Siswa;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
@@ -14,7 +15,22 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
+                ->select('wali_siswa.nama as wali','wali_siswa.alamat', 'siswa.*')
+                ->get();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed show data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -46,7 +62,23 @@ class SiswaController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
+                ->select('wali_siswa.nama as wali','wali_siswa.alamat', 'siswa.*')
+                ->where('siswa.id', $id)
+                ->first();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed show data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -69,7 +101,22 @@ class SiswaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+
+            $siswa['nama'] = $request->nama;
+            $siswa['birth_date'] = $request->birth_date;
+            Siswa::where('id', $id)->update($siswa);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed create data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -80,6 +127,18 @@ class SiswaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            Siswa::where('id', $id)->delete();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed delete data',
+                'error' => $th
+            ]);
+        }
     }
 }

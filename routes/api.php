@@ -34,4 +34,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('kelas')->group(function () {
 
     });
+    Route::prefix('siswa')->group(function () {
+        Route::post('/create-wali', 'API\WalimuridController@store');
+        Route::get('/show-wali', 'API\WalimuridController@index');
+        Route::get('/detail-wali/{id}', 'API\WalimuridController@show');
+        Route::post('/update-wali/{id}', 'API\WalimuridController@update');
+        Route::get('/list', 'API\SiswaController@index');
+        Route::get('/detail/{id}', 'API\SiswaController@show');
+        Route::post('/update/{id}', 'API\SiswaController@update');
+        Route::get('/delete/{id}', 'API\SiswaController@destroy');
+    });
 });

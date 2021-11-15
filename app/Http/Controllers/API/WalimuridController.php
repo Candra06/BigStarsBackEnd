@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Siswa;
+use App\User;
+use App\Walimurid;
 use Illuminate\Http\Request;
 
 class WalimuridController extends Controller
@@ -14,7 +17,23 @@ class WalimuridController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $data = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
+                ->leftJoin('siswa', 'siswa.id_wali', 'wali_siswa.id')
+                ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
+                ->get();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed show data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -35,7 +54,33 @@ class WalimuridController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $user['username'] = $request->username;
+            $user['phone'] = $request->phone;
+            $user['foto'] = '-';
+            $user['password'] = bcrypt($request->password);
+            $user['role'] = 'Walimurid';
+            $user['status'] = 'Active';
+            $inputUser = User::create($user);
+            $wali['id_users'] = $inputUser->id;
+            $wali['nama'] = $request->nama_wali;
+            $wali['alamat'] = $request->alamat;
+            $inputWali = Walimurid::create($wali);
+            $siswa['id_wali'] = $inputWali->id;
+            $siswa['nama'] = $request->nama_siswa;
+            $siswa['birth_date'] = $request->birth_date;
+            Siswa::create($siswa);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed create data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -46,7 +91,23 @@ class WalimuridController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $data = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
+                ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
+                ->where('wali_siswa.id', $id)
+                ->first();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed show data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -69,7 +130,28 @@ class WalimuridController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $idUser = Walimurid::where('id', $id)->first();
+            $user['username'] = $request->username;
+            $user['phone'] = $request->phone;
+            // $user['foto'] = '-';
+            $user['password'] = bcrypt($request->password);
+            $user['status'] = $request->status;
+            User::where('id', $idUser->id_users)->update($user);
+            $wali['nama'] = $request->nama;
+            $wali['alamat'] = $request->alamat;
+            Walimurid::where('id', $id)->update($wali);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed create data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
