@@ -92,10 +92,14 @@ class WalimuridController extends Controller
     public function show($id)
     {
         try {
-            $data = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
+            $data = [];
+            $detail = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
                 ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
                 ->where('wali_siswa.id', $id)
                 ->first();
+            $siswa = Siswa::where('id_wali', $id)->get();
+            $data['detail'] = $detail;
+            $data['siswa'] = $siswa;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',

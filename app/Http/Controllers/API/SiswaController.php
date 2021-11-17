@@ -17,7 +17,7 @@ class SiswaController extends Controller
     {
         try {
             $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
-                ->select('wali_siswa.nama as wali','wali_siswa.alamat', 'siswa.*')
+                ->select('wali_siswa.nama as wali', 'wali_siswa.alamat', 'siswa.*')
                 ->get();
             return response()->json([
                 'status_code' => 200,
@@ -51,7 +51,22 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $siswa['id_wali'] = $request->id_wali;
+            $siswa['nama'] = $request->nama_siswa;
+            $siswa['birth_date'] = $request->birth_date;
+            Siswa::create($siswa);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed create data',
+                'error' => $th
+            ]);
+        }
     }
 
     /**
@@ -64,7 +79,7 @@ class SiswaController extends Controller
     {
         try {
             $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
-                ->select('wali_siswa.nama as wali','wali_siswa.alamat', 'siswa.*')
+                ->select('wali_siswa.nama as wali', 'wali_siswa.alamat', 'siswa.*')
                 ->where('siswa.id', $id)
                 ->first();
             return response()->json([

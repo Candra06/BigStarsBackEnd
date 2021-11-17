@@ -21,7 +21,7 @@ class GuruController extends Controller
     public function index()
     {
         try {
-            $data = Guru::all();
+            $data = Guru::leftJoin('users', 'users.id', 'guru.id_users')->select('users.username', 'users.phone', 'guru.*')->get();
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -93,7 +93,7 @@ class GuruController extends Controller
     public function show($id)
     {
         try {
-            $data = Guru::where('id', $id)->first();
+            $data = Guru::leftJoin('users', 'users.id', 'guru.id_users')->select('users.username', 'users.phone', 'guru.*')->where('guru.id', $id)->first();
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
