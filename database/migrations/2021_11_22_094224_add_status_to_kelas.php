@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNotifikasi extends Migration
+class AddStatusToKelas extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateNotifikasi extends Migration
      */
     public function up()
     {
-        Schema::create('notifikasi', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('title');
-            $table->string('konten');
-            $table->timestamps();
+        Schema::table('kelas', function (Blueprint $table) {
+            $table->enum('status', ['Active', 'Inactive'])->after('fee_guru');
         });
     }
 
@@ -28,6 +25,8 @@ class CreateNotifikasi extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notifikasi');
+        Schema::table('kelas', function (Blueprint $table) {
+            //
+        });
     }
 }

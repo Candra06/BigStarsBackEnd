@@ -17,7 +17,8 @@ class CreateDetailKelas extends Migration
             $table->increments('id');
             $table->integer('id_kelas')->unsigned();
             $table->enum('hari',['Senin','Selasa','Rabu', 'Kamis', 'Jum`at', 'Sabtu', 'Minggu']);
-            $table->integer('jam');
+            $table->integer('jam_mulai');
+            $table->integer('jam_selesai');
             $table->timestamps();
             $table->foreign('id_kelas')->references('id')->on('kelas');
         });

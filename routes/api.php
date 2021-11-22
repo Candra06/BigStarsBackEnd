@@ -16,7 +16,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', 'API\AuthController@login');
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
     Route::post('logout', 'API\AuthController@logout');
+    Route::post('update-profil-admin', 'API\AuthController@updateProfileAdmin');
+    Route::post('update-photo', 'API\AuthController@updateFoto');
     Route::prefix('guru')->group(function () {
         Route::post('/create', 'API\GuruController@store');
         Route::get('/data', 'API\GuruController@index');
@@ -32,7 +36,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/delete/{id}', 'API\MapelController@destroy');
     });
     Route::prefix('kelas')->group(function () {
-
+        Route::get('/list-all', 'API\KelasController@index');
+        Route::post('/create', 'API\KelasController@store');
+        Route::post('/update/{id}', 'API\KelasController@update');
+        Route::get('/detail/{id}', 'API\KelasController@show');
+        Route::get('/kehadiran-kelas/{id}', 'API\KelasController@kehadiranByKelas');
+        Route::get('/filter-kelas/{siswa}/{guru}/{status}', 'API\KelasController@filterKelas');
+        Route::post('/add-absen-admin/{id}', 'API\MengajarController@update');
     });
     Route::prefix('siswa')->group(function () {
         Route::post('/create-wali', 'API\WalimuridController@store');

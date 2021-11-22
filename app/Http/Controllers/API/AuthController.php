@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\API;
 
+use App\DetailKelas;
 use App\User;
 use App\Walimurid;
 use App\Guru;
+use App\Helpers\Helper as HelpersHelper;
 use App\Http\Controllers\Controller;
+use App\Kelas;
+use App\Siswa;
+use Carbon\Carbon;
 use Exception;
+use Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -90,18 +99,46 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-       try {
-        auth()->user()->tokens()->delete();
-        return [
-            'message' => 'Logged out'
-        ];
-       } catch (\Throwable $th) {
-           //throw $th;
-       }
+        try {
+            auth()->user()->tokens()->delete();
+            return [
+                'message' => 'Logged out'
+            ];
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
-    public function index()
+    public function dashboardAdmin()
     {
-        //
+        try {
+            $mytime = Carbon::now();
+
+            $kelas = Kelas::count();
+            $siswa = Siswa::count();
+            $guru = Kelas::count();
+            $kelas_aktif = Kelas::where('status', 'Active')->count();
+            $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
+                ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
+                ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                ->where('detail_kelas.hari', HelpersHelper::getDay($mytime->format('l')))
+                ->get();
+            $data['kelas'] = $kelas;
+            $data['siswa'] = $siswa;
+            $data['guru'] = $guru;
+            $data['kelas_aktif'] = $kelas_aktif;
+            $data['kelas_today'] = $kelas_today;
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
     }
 
     /**
@@ -154,9 +191,46 @@ class AuthController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updateProfileAdmin(Request $request)
     {
-        //
+        try {
+            $user['username'] = $request->username;
+            $user['phone'] = $request->phone;
+            if ($request->password) {
+                $user['password'] = bcrypt($request->password);
+            }
+            User::where('id', Auth::user()->id)->update($user);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
+    public function updateFoto(Request $request)
+    {
+        $fileType = $request->file('foto')->extension();
+        $name = Str::random(8) . '.' . $fileType;
+        $input['foto'] = Storage::putFileAs('foto', $request->file('foto'), $name);
+
+        try {
+            User::where('id', Auth::user()->id)->update($input);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+
     }
 
     /**
