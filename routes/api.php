@@ -55,4 +55,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update/{id}', 'API\SiswaController@update');
         Route::get('/delete/{id}', 'API\SiswaController@destroy');
     });
+    Route::prefix('finance')->group(function () {
+        Route::get('/index/{bulan}', 'API\PembayaranSppController@indexFinance');
+        Route::get('/generate-fee', 'API\PembayaranFeeController@create');
+        Route::get('/list-fee', 'API\PembayaranFeeController@index');
+        Route::get('/generate-spp', 'API\PembayaranSppController@create');
+        Route::get('/list-spp', 'API\PembayaranSppController@index');
+        Route::get('/detail-spp/{id}', 'API\PembayaranSppController@show');
+        Route::get('/detail-fee/{id}', 'API\PembayaranFeeController@show');
+        Route::post('/confirm-fee/{id}', 'API\PembayaranFeeController@update');
+        Route::post('/confirm-spp/{id}', 'API\PembayaranSppController@update');
+        Route::get('/filter-fee/{nama}/{bulan}/{status}', 'API\PembayaranFeeController@filter');
+        Route::get('/filter-spp/{nama}/{bulan}/{status}', 'API\PembayaranSppController@filter');
+    });
 });
