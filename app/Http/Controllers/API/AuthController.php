@@ -25,6 +25,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
+            
             $request->validate([
                 'username' => 'required',
                 'password' => 'required'
@@ -159,7 +160,7 @@ class AuthController extends Controller
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->where('kelas.id_guru', $id->id)
                 ->get();
-            
+
             $data['fee'] = $fee;
             $data['kelas_today'] = $kelas_today;
             return response()->json([
