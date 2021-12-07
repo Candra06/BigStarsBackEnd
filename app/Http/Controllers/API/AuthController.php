@@ -12,7 +12,8 @@ use App\Kelas;
 use App\Siswa;
 use Carbon\Carbon;
 use Exception;
-use Helper;
+use App\Helpers\Helper;
+use App\Mengajar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -100,7 +101,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            auth()->user()->tokens()->delete();
+            // auth()->user()->tokens()->delete();
             return [
                 'message' => 'Logged out'
             ];
@@ -122,12 +123,44 @@ class AuthController extends Controller
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                 ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                ->where('detail_kelas.hari', HelpersHelper::getDay($mytime->format('l')))
+                ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->get();
             $data['kelas'] = $kelas;
             $data['siswa'] = $siswa;
             $data['guru'] = $guru;
             $data['kelas_aktif'] = $kelas_aktif;
+            $data['kelas_today'] = $kelas_today;
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
+    public function dashboardGuru()
+    {
+        try {
+            $mytime = Carbon::now();
+            $bulan = explode(" ", $mytime);
+            $id = Guru::where('id_users',  Auth::user()->id)->first();
+
+            $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
+
+            $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
+                ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
+                ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
+                ->where('kelas.id_guru', $id->id)
+                ->get();
+            
+            $data['fee'] = $fee;
             $data['kelas_today'] = $kelas_today;
             return response()->json([
                 'status_code' => 200,
@@ -200,6 +233,57 @@ class AuthController extends Controller
                 $user['password'] = bcrypt($request->password);
             }
             User::where('id', Auth::user()->id)->update($user);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
+    public function updateProfileGuru(Request $request)
+    {
+        try {
+            $id =  Auth::user()->id;
+            $user['username'] = $request->username;
+            $user['phone'] = $request->phone;
+            if ($request->password) {
+                $user['password'] = bcrypt($request->password);
+            }
+            $guru['nama'] = $request->nama;
+            $guru['birth_date'] = $request->birth_date;
+            $guru['alamat'] = $request->alamat;
+            Guru::where('id_users', $id)->update($guru);
+            User::where('id', $id)->update($user);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
+    public function updateProfileWali(Request $request)
+    {
+        try {
+            $id =  Auth::user()->id;
+            $user['username'] = $request->username;
+            $user['phone'] = $request->phone;
+            if ($request->password) {
+                $user['password'] = bcrypt($request->password);
+            }
+            $wali['nama'] = $request->nama;
+            $wali['alamat'] = $request->alamat;
+            Walimurid::where('id_users', $id)->update($wali);
+            User::where('id', $id)->update($user);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
