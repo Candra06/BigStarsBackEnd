@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Exception;
 use App\Helpers\Helper;
 use App\Mengajar;
+use App\PembayaranFEE;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            
+
             $request->validate([
                 'username' => 'required',
                 'password' => 'required'
@@ -150,19 +151,34 @@ class AuthController extends Controller
             $bulan = explode(" ", $mytime);
             $id = Guru::where('id_users',  Auth::user()->id)->first();
 
-            $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
+            // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
+            $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
 
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas','kelas.status','detail_kelas.jam_mulai','detail_kelas.jam_selesai' )
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->where('kelas.id_guru', $id->id)
                 ->get();
-
-            $data['fee'] = $fee;
+            // return $bulan[0];
+            $sharing =  Mengajar::where('mengajar.id_guru', $id->id)
+                ->leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                ->leftJoin('detail_kelas', 'detail_kelas.id_kelas', 'kelas.id')
+                ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
+                ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                ->whereDate('mengajar.created_at', date('Y-m-d'))
+                ->where('mengajar.tipe', 'Pengganti')
+                ->where('mengajar.status', 'Waiting')
+                ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas','kelas.status','detail_kelas.jam_mulai','detail_kelas.jam_selesai')
+                ->get();
+            // return $sharing;
+            $data['fee'] = $fee->jumlah;
             $data['kelas_today'] = $kelas_today;
+            $data['sharing'] = $sharing;
             return response()->json([
                 'status_code' => 200,
                 'data' => $data
