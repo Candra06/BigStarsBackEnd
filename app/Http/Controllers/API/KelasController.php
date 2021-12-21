@@ -46,22 +46,24 @@ class KelasController extends Controller
                     ->where('kelas.id_siswa', $siswa->id)
                     ->get();
             }
+
             foreach ($dt as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
-                $data['id'] = $key->id;
-                $data['guru'] = $key->guru;
-                $data['siswa'] = $key->siswa;
-                $data['mapel'] = $key->mapel;
-                $data['id_mapel'] = $key->id_mapel;
-                $data['id_guru'] = $key->id_guru;
-                $data['id_siswa'] = $key->id_siswa;
-                $data['spp'] = $key->spp;
-                $data['fee_guru'] = $key->fee_guru;
-                $data['status'] = $key->status;
-                $data['jam_mulai'] = $detail->jam_mulai;
-                $data['jam_selesai'] = $detail->jam_selesai;
-                $data['created_at'] = $key->created_at;
-                $data['updated_at'] = $key->updated_at;
+                $tmp['id'] = $key->id;
+                $tmp['guru'] = $key->guru;
+                $tmp['siswa'] = $key->siswa;
+                $tmp['mapel'] = $key->mapel;
+                $tmp['id_mapel'] = $key->id_mapel;
+                $tmp['id_guru'] = $key->id_guru;
+                $tmp['id_siswa'] = $key->id_siswa;
+                $tmp['spp'] = $key->spp;
+                $tmp['fee_guru'] = $key->fee_guru;
+                $tmp['status'] = $key->status;
+                $tmp['jam_mulai'] = $detail->jam_mulai;
+                $tmp['jam_selesai'] = $detail->jam_selesai;
+                $tmp['created_at'] = $key->created_at;
+                $tmp['updated_at'] = $key->updated_at;
+                array_push($data, $tmp);
             }
             return response()->json([
                 'status_code' => 200,

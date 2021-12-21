@@ -15,6 +15,7 @@ use Exception;
 use App\Helpers\Helper;
 use App\Mengajar;
 use App\PembayaranFEE;
+use App\PembayaranSPP;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,6 +40,7 @@ class AuthController extends Controller
                 ]);
             }
             $user = User::where('username', $request->username)->where('status', 'Active')->first();
+            
             if ($user) {
                 if (password_verify($request->password, $user->password)) {
                     $tokenResult = $user->createToken('authToken')->plainTextToken;
@@ -158,7 +160,7 @@ class AuthController extends Controller
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas','kelas.status','detail_kelas.jam_mulai','detail_kelas.jam_selesai' )
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->where('kelas.id_guru', $id->id)
                 ->get();
@@ -173,12 +175,58 @@ class AuthController extends Controller
                 ->where('mengajar.tipe', 'Pengganti')
                 ->where('mengajar.status', 'Waiting')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
-                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas','kelas.status','detail_kelas.jam_mulai','detail_kelas.jam_selesai')
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->get();
             // return $sharing;
             $data['fee'] = $fee->jumlah;
             $data['kelas_today'] = $kelas_today;
             $data['sharing'] = $sharing;
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
+    public function dashboardWali()
+    {
+        try {
+            $mytime = Carbon::now();
+            $bulan = explode(" ", $mytime);
+            $id = Walimurid::where('id_users',  Auth::user()->id)->first();
+            $siswa = Siswa::where('id_wali', $id->id)->get();
+            $spp = 0;
+            foreach ($siswa as $val) {
+                # code...
+                $tmp = PembayaranSPP::where('id_siswa', $val->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
+                $spp += $tmp->jumlah;
+            }
+
+
+            // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
+            $kelas = [];
+            // return $siswa;
+            foreach ($siswa as $value) {
+                $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
+                    ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                    ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
+                    ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
+                    ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
+                    ->where('kelas.id_siswa', $value->id)
+                    ->get();
+                foreach ($kelas_today as $key) {
+                    array_push($kelas, $key);
+                }
+            }
+            $data['spp'] = $spp;
+            $data['kelas_today'] = $kelas;
+
             return response()->json([
                 'status_code' => 200,
                 'data' => $data
@@ -331,7 +379,6 @@ class AuthController extends Controller
                 'message' => $th,
             ]);
         }
-
     }
 
     /**

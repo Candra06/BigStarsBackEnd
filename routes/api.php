@@ -19,10 +19,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
     Route::get('dashboard-guru', 'API\AuthController@dashboardGuru');
+    Route::get('dashboard-wali', 'API\AuthController@dashboardWali');
     Route::post('logout', 'API\AuthController@logout');
     Route::post('update-profil-admin', 'API\AuthController@updateProfileAdmin');
     Route::post('update-profil-guru', 'API\AuthController@updateProfileGuru');
-    Route::post('update-profil-walli', 'API\AuthController@updateProfileWali');
+    Route::post('update-profil-wali', 'API\AuthController@updateProfileWali');
     Route::post('update-photo', 'API\AuthController@updateFoto');
     Route::prefix('guru')->group(function () {
         Route::post('/create', 'API\GuruController@store');
