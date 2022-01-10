@@ -42,6 +42,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('kelas')->group(function () {
         Route::get('/list-all', 'API\KelasController@index');
         Route::post('/create', 'API\KelasController@store');
+        Route::post('/add-jadwal/{id}', 'API\KelasController@addJadwal');
+        Route::get('/delete-jadwal/{id}', 'API\KelasController@destroy');
+        Route::post('/create', 'API\KelasController@store');
         Route::post('/update/{id}', 'API\KelasController@update');
         Route::get('/detail/{id}', 'API\KelasController@show');
         Route::get('/kehadiran-kelas/{id}', 'API\KelasController@kehadiranByKelas');

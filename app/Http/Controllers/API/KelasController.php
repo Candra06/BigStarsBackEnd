@@ -256,6 +256,34 @@ class KelasController extends Controller
         }
     }
 
+    public function addJadwal(Request $request, $id)
+    {
+        $request->validate([
+            // 'hari' => 'required',
+            'id_jadwal' => 'required',
+            'jam_mulai' => 'required',
+            'jam_selesai' => 'required',
+        ]);
+
+        try {
+            $detail['jam_mulai'] = $request->jam_mulai;
+            $detail['jam_selesai'] = $request->jam_selesai;
+            $detail['hari'] = $request->hari;
+            $detail['id_kelas'] = $id;
+            DetailKelas::create($detail);
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
     public function kehadiranByKelas($id)
     {
         try {
