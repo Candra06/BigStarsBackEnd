@@ -40,7 +40,7 @@ class AuthController extends Controller
                 ]);
             }
             $user = User::where('username', $request->username)->where('status', 'Active')->first();
-            
+
             if ($user) {
                 if (password_verify($request->password, $user->password)) {
                     $tokenResult = $user->createToken('authToken')->plainTextToken;
@@ -126,7 +126,7 @@ class AuthController extends Controller
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*', 'detail_kelas.hari', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->get();
             $data['kelas'] = $kelas;
