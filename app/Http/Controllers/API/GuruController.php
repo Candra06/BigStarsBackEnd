@@ -132,7 +132,9 @@ class GuruController extends Controller
             $data = Guru::where('id', $id)->first();
             // return $data;
             $input['username'] = $request->username;
-            $input['password'] = bcrypt($request->password);
+            if ($request->password) {
+                $input['password'] = bcrypt($request->password);
+            }
             $input['foto'] = $request->foto;
             $input['phone'] = $request->phone;
             $input['status'] = $request->status;

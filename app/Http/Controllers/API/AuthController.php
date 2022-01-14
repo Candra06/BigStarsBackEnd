@@ -120,7 +120,7 @@ class AuthController extends Controller
 
             $kelas = Kelas::count();
             $siswa = Siswa::count();
-            $guru = Kelas::count();
+            $guru = Guru::count();
             $kelas_aktif = Kelas::where('status', 'Active')->count();
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
