@@ -298,9 +298,11 @@ class AuthController extends Controller
                 $user['password'] = bcrypt($request->password);
             }
             User::where('id', Auth::user()->id)->update($user);
+            $data = User::where('id', Auth::user()->id)->first();
             return response()->json([
                 'status_code' => 200,
-                'message' => 'Success'
+                'message' => 'Success',
+                'data' => $data,
             ]);
         } catch (\Throwable $th) {
             return response()->json([
