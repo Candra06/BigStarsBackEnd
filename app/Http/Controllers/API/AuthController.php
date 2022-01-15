@@ -371,9 +371,11 @@ class AuthController extends Controller
 
         try {
             User::where('id', Auth::user()->id)->update($input);
+            $data = User::where('id', Auth::user()->id)->first();
             return response()->json([
                 'status_code' => 200,
-                'message' => 'Success'
+                'message' => 'Success',
+                'data' => $data
             ]);
         } catch (\Throwable $th) {
             return response()->json([
