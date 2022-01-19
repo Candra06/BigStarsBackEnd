@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Siswa;
 use App\User;
 use App\Walimurid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 
 class WalimuridController extends Controller
 {
@@ -41,9 +44,22 @@ class WalimuridController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        try {
+            $siswa['id_wali'] = $request->id_wali;
+            $siswa['nama'] = $request->nama;
+            $siswa['status'] = 'Aktif';
+            $siswa['kode_referal'] = 'BS'+Helper::generateRandomString(5);
+            $siswa['birth_date'] = $request->birth_date;
+            Siswa::create($siswa);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

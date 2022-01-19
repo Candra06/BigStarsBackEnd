@@ -57,6 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('siswa')->group(function () {
         Route::post('/create-wali', 'API\WalimuridController@store');
+        Route::post('/create-suswa-byWali', 'API\WalimuridController@create');
         Route::get('/show-wali', 'API\WalimuridController@index');
         Route::get('/detail-wali/{id}', 'API\WalimuridController@show');
         Route::post('/update-wali/{id}', 'API\WalimuridController@update');
