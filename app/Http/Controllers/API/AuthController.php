@@ -153,6 +153,7 @@ class AuthController extends Controller
             $bulan = explode(" ", $mytime);
             $id = Guru::where('id_users',  Auth::user()->id)->first();
 
+            $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id)->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
             $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
 
@@ -180,6 +181,7 @@ class AuthController extends Controller
             // return $sharing;
             $data['fee'] = $fee->jumlah;
             $data['kelas_today'] = $kelas_today;
+            $data['kelas_aktif'] = $kelas_aktif;
             $data['sharing'] = $sharing;
             return response()->json([
                 'status_code' => 200,
