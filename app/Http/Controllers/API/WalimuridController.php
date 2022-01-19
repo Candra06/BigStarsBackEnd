@@ -51,7 +51,7 @@ class WalimuridController extends Controller
             $siswa['id_wali'] = $request->id_wali;
             $siswa['nama'] = $request->nama;
             $siswa['status'] = 'Aktif';
-            $siswa['kode_referal'] = 'BS'+Helper::generateRandomString(5);
+            $siswa['kode_referal'] = 'BS'.Helper::generateRandomString(5);
             $siswa['birth_date'] = $request->birth_date;
             Siswa::create($siswa);
             return response()->json([
