@@ -47,7 +47,7 @@ class WalimuridController extends Controller
     public function create(Request $request)
     {
         try {
-            return Helper::generateRandomString(5);
+            
             $siswa['id_wali'] = $request->id_wali;
             $siswa['nama'] = $request->nama;
             $siswa['status'] = 'Aktif';
