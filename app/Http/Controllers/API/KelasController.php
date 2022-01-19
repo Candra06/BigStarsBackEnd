@@ -18,36 +18,47 @@ class KelasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             $data = [];
             $dt = [];
+            // return $request;
             if (Auth::user()->role == 'Admin') {
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                    ->get();
+                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*');
             } else if (Auth::user()->role == 'Guru') {
                 $guru = Guru::where('id_users', Auth::user()->id)->first();
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                    ->where('kelas.id_guru', $guru->id)
-                    ->get();
+                    ->where('kelas.id_guru', $guru->id);
             } else {
                 $siswa = Guru::where('id_users', Auth::user()->id)->first();
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                    ->where('kelas.id_siswa', $siswa->id)
-                    ->get();
+                    ->where('kelas.id_siswa', $siswa->id);
             }
+            if ($request->siswa) {
+                // $param = $request->query('siswa');
+                $dt = $dt->where('siswa.nama', 'like', '%' . $request->siswa . '%');
+            }
+            if ($request->query('guru') != '') {
+                $param = $request->query('guru');
+                // return $param;
+                $dt = $dt->where("guru.nama", "LIKE", "%$param%");
+            }
+            if ($request->status) {
+                $dt = $dt->where('kelas.status', $request->status);
+            }
+            $result = $dt->get();
 
-            foreach ($dt as $key) {
+            foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $tmp['id'] = $key->id;
                 $tmp['guru'] = $key->guru;
@@ -184,28 +195,40 @@ class KelasController extends Controller
             $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                ->where('siswa.nama', 'like', '%' . $siswa . '%')
-                ->orWhere('guru.nama', 'like', '%' . $guru . '%')
-                ->orWhere('kelas.status', $status)
-                ->get();
+                ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*');
+            // ->where('siswa.nama', 'like', '%' . $siswa . '%')
+            // ->orWhere('guru.nama', 'like', '%' . $guru . '%')
+            // ->orWhere('kelas.status', $status)
+            $wer = '';
+            if ($siswa != '-') {
+                $dt = $dt->where('siswa.nama', 'like', '%' . $siswa . '%');
+            }
+            if ($guru != '-') {
+                $dt = $dt->where('guru.nama', 'like', '%' . $guru . '%');
+            }
+            if ($status  != '-') {
+                $dt = $dt->where('kelas.status', $status);
+            }
+            $result = $dt->get();
 
-            foreach ($dt as $key) {
+            // return $result;
+            foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
-                $data['id'] = $key->id;
-                $data['guru'] = $key->guru;
-                $data['siswa'] = $key->siswa;
-                $data['mapel'] = $key->mapel;
-                $data['id_mapel'] = $key->id_mapel;
-                $data['id_guru'] = $key->id_guru;
-                $data['id_siswa'] = $key->id_siswa;
-                $data['spp'] = $key->spp;
-                $data['fee_guru'] = $key->fee_guru;
-                $data['status'] = $key->status;
-                $data['jam_mulai'] = $detail->jam_mulai;
-                $data['jam_selesai'] = $detail->jam_selesai;
-                $data['created_at'] = $key->created_at;
-                $data['updated_at'] = $key->updated_at;
+                $tmp['id'] = $key->id;
+                $tmp['guru'] = $key->guru;
+                $tmp['siswa'] = $key->siswa;
+                $tmp['mapel'] = $key->mapel;
+                $tmp['id_mapel'] = $key->id_mapel;
+                $tmp['id_guru'] = $key->id_guru;
+                $tmp['id_siswa'] = $key->id_siswa;
+                $tmp['spp'] = $key->spp;
+                $tmp['fee_guru'] = $key->fee_guru;
+                $tmp['status'] = $key->status;
+                $tmp['jam_mulai'] = $detail->jam_mulai;
+                $tmp['jam_selesai'] = $detail->jam_selesai;
+                $tmp['created_at'] = $key->created_at;
+                $tmp['updated_at'] = $key->updated_at;
+                array_push($data, $tmp);
             }
             return response()->json([
                 'status_code' => 200,
@@ -289,9 +312,9 @@ class KelasController extends Controller
         try {
 
             $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
-            ->where('mengajar.id_kelas', $id)
-            ->select('guru.nama', 'mengajar.*')
-            ->get();
+                ->where('mengajar.id_kelas', $id)
+                ->select('guru.nama', 'mengajar.*')
+                ->get();
 
             return response()->json([
                 'status_code' => 200,

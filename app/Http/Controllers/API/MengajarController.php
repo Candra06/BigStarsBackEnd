@@ -104,7 +104,27 @@ class MengajarController extends Controller
      */
     public function create()
     {
-        //
+
+    }
+
+    public function absensi($id)
+    {
+        try {
+            $data = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+            ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+            ->select('mengajar.*', 'siswa.nama')
+            ->where('mengajar.id_guru', $id)->get();
+            return response()->json([
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return $th;
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
     }
 
     /**
