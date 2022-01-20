@@ -77,7 +77,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/detail-fee/{id}', 'API\PembayaranFeeController@show');
         Route::post('/confirm-fee/{id}', 'API\PembayaranFeeController@update');
         Route::post('/confirm-spp/{id}', 'API\PembayaranSppController@update');
+        Route::get('/report', 'API\PembayaranFeeController@report');
         Route::get('/filter-fee/{nama}/{bulan}/{status}', 'API\PembayaranFeeController@filter');
         Route::get('/filter-spp/{nama}/{bulan}/{status}', 'API\PembayaranSppController@filter');
+    });
+
+    Route::prefix('notfikasi')->group(function () {
+        Route::get('/list', 'API\NotifikasiController@index');
+        Route::post('/read/{id}', 'API\NotifikasiController@readNotif');
     });
 });

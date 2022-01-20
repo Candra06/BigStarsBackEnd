@@ -6,6 +6,7 @@ use App\Guru;
 use App\Http\Controllers\Controller;
 use App\Mengajar;
 use App\PembayaranFEE;
+use App\PembayaranSPP;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -18,22 +19,31 @@ class PembayaranFeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = [];
+            $query = [];
             $role = Auth::user()->role;
+
             if ($role == 'Guru') {
                 $idGuru = Guru::where('id_users', Auth::user()->id)->first();
-                $data = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
+                $query = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                     ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*')
-                    ->where('guru.id', $idGuru->id)
-                    ->get();
+                    ->where('guru.id', $idGuru->id);
+                // ->get();
             } else {
-                $data = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
-                    ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*')
-                    ->get();
+                $query = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
+                    ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*');
+                // ->get();
             }
+            if ($request->bulan) {
+                $query = $query->whereMonth('pembayaran_fee.tagihan_bulan',  $request->bulan);
+            }
+            if ($request->tahun) {
+                $query = $query->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
+            }
+
+            $data = $query->get();
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -97,6 +107,56 @@ class PembayaranFeeController extends Controller
         }
     }
 
+    public function report()
+    {
+        try {
+            $data = [];
+            $spp = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
+                ->select('siswa.nama', 'pembayaran_spp.*')
+                ->get();
+            $fee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
+                ->select('guru.nama', 'pembayaran_fee.*')
+                ->get();
+            foreach ($spp as $s) {
+                $tmp['id'] = $s->id;
+                $tmp['tipe'] = 'SPP';
+                $tmp['invoice'] = $s->no_invoice;
+                $tmp['nama'] = $s->nama;
+                $tmp['status'] = $s->status;
+                $tmp['nominal'] = $s->jumlah;
+                $tmp['created_at'] = $s->created_at;
+                $tmp['updated_at'] = $s->updated_at;
+                array_push($data, $tmp);
+            }
+            foreach ($fee as $f) {
+                $tmp['id'] = $f->id;
+                $tmp['tipe'] = 'FEE';
+                $tmp['invoice'] = $f->no_invoice;
+                $tmp['nama'] = $f->nama;
+                $tmp['status'] = $f->status;
+                $tmp['nominal'] = $f->jumlah;
+                $tmp['created_at'] = $f->created_at;
+                $tmp['updated_at'] = $f->updated_at;
+                array_push($data, $tmp);
+            }
+            $tmpData = collect($data);
+            $sorted = $tmpData->sortBy('created_at', SORT_REGULAR, false);
+            $dt = [];
+            foreach ($sorted as $key => $value) {
+                // $tmp['key'] = $value;
+                array_push($dt, $value);
+            }
+            // return $dt;
+
+            return response()->json([
+                'status_code' => 200,
+                'data' => $dt
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -119,16 +179,15 @@ class PembayaranFeeController extends Controller
                     ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*')
                     ->where('guru.id', $idGuru->id)
                     ->orWhere('pembayaran_fee.tagihan_bulan', 'like', '%' . $bulan . '%')
-                    ->orWhere('pembayaran_fee.status',$status )
+                    ->orWhere('pembayaran_fee.status', $status)
                     ->get();
             } else {
                 $data = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                     ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*')
                     ->where('guru.nama', 'like', '%' . $nama . '%')
                     ->orWhere('pembayaran_fee.tagihan_bulan', 'like', '%' . $bulan . '%')
-                    ->orWhere('pembayaran_fee.status',  $status )
+                    ->orWhere('pembayaran_fee.status',  $status)
                     ->get();
-
             }
             return response()->json([
                 'status_code' => 200,
@@ -199,9 +258,9 @@ class PembayaranFeeController extends Controller
     {
         try {
             PembayaranFEE::where('id', $id)->update([
-                'updated_by'=>Auth::user()->id,
-                'updated_at'=>Carbon::now(),
-                'status'=>'Lunas'
+                'updated_by' => Auth::user()->id,
+                'updated_at' => Carbon::now(),
+                'status' => 'Lunas'
             ]);
             return response()->json([
                 'status_code' => 200,

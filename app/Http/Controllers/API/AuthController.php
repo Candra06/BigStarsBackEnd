@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Exception;
 use App\Helpers\Helper;
 use App\Mengajar;
+use App\NotifikasiDetail;
 use App\PembayaranFEE;
 use App\PembayaranSPP;
 use Illuminate\Http\Request;
@@ -120,6 +121,7 @@ class AuthController extends Controller
 
             $kelas = Kelas::count();
             $siswa = Siswa::count();
+            $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
             $guru = Guru::count();
             $kelas_aktif = Kelas::where('status', 'Active')->count();
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
@@ -132,6 +134,7 @@ class AuthController extends Controller
             $data['kelas'] = $kelas;
             $data['siswa'] = $siswa;
             $data['guru'] = $guru;
+            $data['notif_unread'] = $notif;
             $data['kelas_aktif'] = $kelas_aktif;
             $data['kelas_today'] = $kelas_today;
             return response()->json([
@@ -152,7 +155,7 @@ class AuthController extends Controller
             $mytime = Carbon::now();
             $bulan = explode(" ", $mytime);
             $id = Guru::where('id_users',  Auth::user()->id)->first();
-
+            $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
             $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id)->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
             $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
@@ -180,6 +183,7 @@ class AuthController extends Controller
                 ->get();
             // return $sharing;
             $data['fee'] = $fee->jumlah;
+            $data['notif_unread'] = $notif;
             $data['kelas_today'] = $kelas_today;
             $data['kelas_aktif'] = $kelas_aktif;
             $data['sharing'] = $sharing;
@@ -199,6 +203,7 @@ class AuthController extends Controller
     {
         try {
             $mytime = Carbon::now();
+            $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
             $bulan = explode(" ", $mytime);
             $id = Walimurid::where('id_users',  Auth::user()->id)->first();
             $siswa = Siswa::where('id_wali', $id->id)->get();
@@ -227,6 +232,7 @@ class AuthController extends Controller
                 }
             }
             $data['spp'] = $spp;
+            $data['notif_unread'] = $notif;
             $data['kelas_today'] = $kelas;
 
             return response()->json([
@@ -241,56 +247,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function updateProfileAdmin(Request $request)
     {
         try {

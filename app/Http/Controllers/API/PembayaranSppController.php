@@ -51,24 +51,32 @@ class PembayaranSppController extends Controller
             ]);
         }
     }
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = [];
+            $query = [];
             $role = Auth::user()->role;
             if ($role == 'Walimurid') {
                 $idSiswa = Siswa::where('id_wali', Auth::user()->id)->get();
                 foreach ($idSiswa as $id) {
-                    $data = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
+                    $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                         ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
-                        ->where('siswa.id', $id->id)
-                        ->get();
+                        ->where('siswa.id', $id->id);
                 }
             } else {
-                $data = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
-                    ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
-                    ->get();
+                $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
+                    ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*');
             }
+
+            if ($request->bulan) {
+                $query = $query->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
+            }
+
+            if ($request->tahun) {
+                $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
+            }
+
+            $data = $query->get();
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -247,9 +255,9 @@ class PembayaranSppController extends Controller
     {
         try {
             PembayaranSPP::where('id', $id)->update([
-                'updated_by'=>Auth::user()->id,
-                'updated_at'=>Carbon::now(),
-                'status'=>'Lunas'
+                'updated_by' => Auth::user()->id,
+                'updated_at' => Carbon::now(),
+                'status' => 'Lunas'
             ]);
             return response()->json([
                 'status_code' => 200,
