@@ -42,6 +42,9 @@ class PembayaranFeeController extends Controller
             if ($request->tahun) {
                 $query = $query->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
             }
+            if ($request->nama) {
+                $query = $query->where('guru.nama',  'like', '%' . $request->nama . '%');
+            }
 
             $data = $query->get();
             return response()->json([

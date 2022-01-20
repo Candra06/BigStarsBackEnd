@@ -76,6 +76,10 @@ class PembayaranSppController extends Controller
                 $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
             }
 
+            if ($request->nama) {
+                $query = $query->where('siswa.nama',  'like', '%' . $request->nama . '%');
+            }
+
             $data = $query->get();
             return response()->json([
                 'status_code' => 200,
