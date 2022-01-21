@@ -110,16 +110,31 @@ class PembayaranFeeController extends Controller
         }
     }
 
-    public function report()
+    public function report(Request $request)
     {
         try {
             $data = [];
-            $spp = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
+            $querySpp = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                 ->select('siswa.nama', 'pembayaran_spp.*')
                 ->get();
-            $fee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
+            $queryFee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                 ->select('guru.nama', 'pembayaran_fee.*')
                 ->get();
+            if ($request->bulan) {
+                $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $request->bulan);
+                $$querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
+            }
+            if ($request->tahun) {
+                $queryFee = $queryFee->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
+                $querySpp = $querySpp->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
+            }
+            if ($request->nama) {
+                $queryFee = $queryFee->where('guru.nama',  'like', '%' . $request->nama . '%');
+                $querySpp = $querySpp->where('siswa.nama',  'like', '%' . $request->nama . '%');
+            }
+            $spp = $querySpp->get();
+            $fee = $queryFee->get();
+
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
                 $tmp['tipe'] = 'SPP';
