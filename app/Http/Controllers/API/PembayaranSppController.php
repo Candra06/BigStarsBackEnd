@@ -88,7 +88,7 @@ class PembayaranSppController extends Controller
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
-                'query' => $q,
+                // 'query' => $q,
                 'data' => $data,
             ]);
         } catch (\Throwable $th) {
