@@ -126,6 +126,7 @@ class PembayaranFeeController extends Controller
                 $tmp['invoice'] = $s->no_invoice;
                 $tmp['nama'] = $s->nama;
                 $tmp['status'] = $s->status;
+                $tmp['tagihan_bulan'] = $s->tagihan_bulan;
                 $tmp['nominal'] = $s->jumlah;
                 $tmp['created_at'] = $s->created_at;
                 $tmp['updated_at'] = $s->updated_at;
@@ -137,6 +138,7 @@ class PembayaranFeeController extends Controller
                 $tmp['invoice'] = $f->no_invoice;
                 $tmp['nama'] = $f->nama;
                 $tmp['status'] = $f->status;
+                $tmp['tagihan_bulan'] = $f->tagihan_bulan;
                 $tmp['nominal'] = $f->jumlah;
                 $tmp['created_at'] = $f->created_at;
                 $tmp['updated_at'] = $f->updated_at;
