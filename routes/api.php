@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/updateKehadiran/{id}', 'API\MengajarController@updateKehadiranKelas');
         Route::get('/absensi/{id}', 'API\MengajarController@absensi');
         Route::get('/delete/{id}', 'API\KelasController@destroyKelas');
-        Route::post('/update/{id}', 'API\KelasController@updateStatus');
+        Route::post('/updateStatus/{id}', 'API\KelasController@updateStatus');
     });
     Route::prefix('siswa')->group(function () {
         Route::post('/create-wali', 'API\WalimuridController@store');
