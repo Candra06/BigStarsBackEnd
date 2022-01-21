@@ -17,7 +17,7 @@ class NotifikasiController extends Controller
             $id = Auth::user()->id;
             $data = NotifikasiDetail::leftJoin('notifikasi', 'notifikasi.id', 'notifikasi_detail.id_notif')
                 ->where('notifikasi_detail.id_penerima', $id)
-                ->select('notifikasi_detail.id', 'notifikasi.judul', 'notifikasi.konten', 'notifikasi_detail.status')
+                ->select('notifikasi_detail.id', 'notifikasi.judul', 'notifikasi.konten', 'notifikasi_detail.status', 'notifikasi_detail.created_at')
                 ->get();
             return response()->json([
                 'status_code' => 200,
