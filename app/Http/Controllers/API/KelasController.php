@@ -354,7 +354,7 @@ class KelasController extends Controller
     public function destroyKelas($id)
     {
         try {
-            DetailKelas::where('id', $id)->update(['status' => 'Deleted', 'updated_at' => Carbon::now()]);
+            Kelas::where('id', $id)->update(['status' => 'Deleted', 'updated_at' => Carbon::now()]);
 
             return response()->json([
                 'status_code' => 200,
@@ -371,13 +371,15 @@ class KelasController extends Controller
     public function updateStatus(Request $request, $id)
     {
         try {
-            DetailKelas::where('id', $id)->update(['status' => $request->status, 'updated_at' => Carbon::now()]);
+            // return $request;
+            Kelas::where('id', $id)->update(['status' => $request->status, 'updated_at' => Carbon::now()]);
 
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
             ]);
         } catch (\Throwable $th) {
+            return $th;
             return response()->json([
                 'status_code' => 401,
                 'message' => $th,
