@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PembayaranFeeController extends Controller
 {
@@ -113,13 +114,13 @@ class PembayaranFeeController extends Controller
     public function report(Request $request)
     {
         try {
+            DB::enableQueryLog();
             $data = [];
             $querySpp = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
-                ->select('siswa.nama', 'pembayaran_spp.*')
-                ->get();
+                ->select('siswa.nama', 'pembayaran_spp.*');
+
             $queryFee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
-                ->select('guru.nama', 'pembayaran_fee.*')
-                ->get();
+                ->select('guru.nama', 'pembayaran_fee.*');
             if ($request->bulan) {
                 $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $request->bulan);
                 $$querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
@@ -134,7 +135,8 @@ class PembayaranFeeController extends Controller
             }
             $spp = $querySpp->get();
             $fee = $queryFee->get();
-
+            // $q = DB::getQueryLog();
+            // return $q;
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
                 $tmp['tipe'] = 'SPP';
