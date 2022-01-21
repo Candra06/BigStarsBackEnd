@@ -11,6 +11,7 @@ use App\Siswa;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PembayaranSppController extends Controller
 {
@@ -54,6 +55,7 @@ class PembayaranSppController extends Controller
     public function index(Request $request)
     {
         try {
+            DB::enableQueryLog();
             $query = [];
             $role = Auth::user()->role;
             if ($role == 'Walimurid') {
@@ -81,10 +83,13 @@ class PembayaranSppController extends Controller
             }
 
             $data = $query->get();
+            $q = DB::getQueryLog();
+            // return $data;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
-                'data' => $data
+                'query' => $$q,
+                'data' => $data,
             ]);
         } catch (\Throwable $th) {
             return response()->json([
