@@ -44,6 +44,7 @@ class KelasController extends Controller
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
                     ->where('kelas.id_siswa', $siswa->id);
             }
+            $dt = $dt->where('kelas.status', '!=', 'Deleted');
             if ($request->siswa) {
                 // $param = $request->query('siswa');
                 $dt = $dt->where('siswa.nama', 'like', '%' . $request->siswa . '%');
