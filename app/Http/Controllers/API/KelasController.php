@@ -120,6 +120,7 @@ class KelasController extends Controller
             'jam_selesai' => 'required',
         ]);
         try {
+
             $hari = explode(",", $request->hari);
             $kelas = Kelas::create([
                 'id_mapel' => $request->id_mapel,
@@ -139,6 +140,8 @@ class KelasController extends Controller
                 $detail['jam_selesai'] = $request->jam_selesai;
                 DetailKelas::create($detail);
             }
+
+
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Referal;
 use App\Siswa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class SiswaController extends Controller
@@ -56,6 +58,15 @@ class SiswaController extends Controller
             $siswa['nama'] = $request->nama_siswa;
             $siswa['birth_date'] = $request->birth_date;
             Siswa::create($siswa);
+            if($request->kode_referal) {
+                $idRef = Siswa::where('kode_referal', $request->kode_referal)->first();
+                $reff['reff_id'] = $idRef->id;
+                $reff['id_siswa'] = $request->id_siswa;
+                $reff['status'] = 'Aktif';
+                $reff['created_at'] = Carbon::now();
+                $reff['updated_at'] = Carbon::now();
+                Referal::create($reff);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -121,6 +132,9 @@ class SiswaController extends Controller
             $siswa['nama'] = $request->nama;
             $siswa['birth_date'] = $request->birth_date;
             Siswa::where('id', $id)->update($siswa);
+            if ($request->status == 'Nonaktif') {
+                Referal::where('id_siswa', $id)->update(['status'=>'Inactive']);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -143,7 +157,8 @@ class SiswaController extends Controller
     public function destroy($id)
     {
         try {
-            Siswa::where('id', $id)->delete();
+            Siswa::where('id', $id)->update(['status' => 'Deleted']);
+            Referal::where('id_siswa', $id)->update(['status'=>'Inactive']);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
