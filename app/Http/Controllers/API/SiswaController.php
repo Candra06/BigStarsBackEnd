@@ -20,6 +20,7 @@ class SiswaController extends Controller
         try {
             $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
                 ->select('wali_siswa.nama as wali', 'wali_siswa.alamat', 'siswa.*')
+                ->where('siswa.status', '!=', 'Deleted')
                 ->get();
             return response()->json([
                 'status_code' => 200,
