@@ -160,7 +160,7 @@ class AuthController extends Controller
             $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id)->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
             $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
-            return $fee;
+            // return $fee;
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                 ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
@@ -184,7 +184,11 @@ class AuthController extends Controller
                 ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->get();
             // return $sharing;
-            $data['fee'] = $fee->jumlah;
+            if ($fee) {
+                $data['fee'] = $fee->jumlah;
+            }else{
+                $data['fee'] = 0;
+            }
             $data['notif_unread'] = $notif;
             $data['kelas_today'] = $kelas_today;
             $data['kelas_aktif'] = $kelas_aktif;
