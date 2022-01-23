@@ -80,15 +80,54 @@ class PembayaranFeeController extends Controller
                 $guru = Guru::all();
                 $absen = [];
                 $total = 0;
-                foreach ($guru as $g) {
-                    $dt = Mengajar::where('id_guru', $g->id)->get();
-                    foreach ($dt as $key) {
-                        $total += $key->fee_pengajar;
+                $dt = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                    ->select('id_guru', 'fee_pengajar')
+                    ->orderBy('id_guru')
+                    ->get();
+                $m = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                    ->select('id_guru', 'fee_pengajar')
+                    ->orderBy('id_guru')
+                    ->distinct()
+                    ->count('id_guru');
+                $idGuru = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                    ->select('id_guru')
+                    ->orderBy('id_guru')
+                    ->groupBy('id_guru')
+                    ->get();
+                // return $idGuru;
+                $tmpTotalFee = [];
+                for ($i = 0; $i < $m; $i++) {
+                    array_push($tmpTotalFee, 0);
+                }
+                $a = 0;
+
+                for ($i = 0; $i < count($dt); $i++) {
+                    if ($i > 0) {
+                        if ($dt[$i]['id_guru'] == $dt[$i - 1]['id_guru']) {
+                            $total += $dt[$i]['fee_pengajar'];
+                            if ($i == count($dt) - 1) {
+                                $tmpTotalFee[$a] = $total;
+                            }
+                        } else {
+                            $tmpTotalFee[$a] = $total;
+                            $total = $dt[$i]['fee_pengajar'];
+                            $a++;
+                            if ($i == count($dt) - 1) {
+                                $tmpTotalFee[$a] = $total;
+                            }
+                        }
+                    } else {
+                        $total = $dt[$i]['fee_pengajar'];
                     }
+                }
+                // return $tmpTotalFee; value fee pengajar
+
+                for ($i = 0; $i < $m; $i++) {
+
                     $now = Carbon::now();
-                    $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $g->id;
-                    $absen['id_guru'] = $g->id;
-                    $absen['jumlah'] = $total;
+                    $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $idGuru[$i]->id_guru;
+                    $absen['id_guru'] = $idGuru[$i]->id_guru;
+                    $absen['jumlah'] = $tmpTotalFee[$i];
                     $absen['tagihan_bulan'] = $now->format('Y-m-d');
                     $absen['status'] = 'Belum Lunas';
                     $absen['created_by'] = Auth::user()->id;
@@ -97,9 +136,11 @@ class PembayaranFeeController extends Controller
                     $absen['updated_at'] = $now;
                     PembayaranFEE::create($absen);
                 }
+
                 return response()->json([
                     'status_code' => 200,
-                    'message' => 'Success'
+                    'message' => 'Success',
+                    'data' => $absen
                 ]);
             }
         } catch (\Throwable $th) {
