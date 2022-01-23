@@ -130,6 +130,7 @@ class AuthController extends Controller
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                 ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*', 'detail_kelas.hari', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
+                ->where('kelas.status', '!=', 'Deleted')
                 ->get();
             $data['kelas'] = $kelas;
             $data['siswa'] = $siswa;
@@ -167,6 +168,7 @@ class AuthController extends Controller
                 ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->where('kelas.id_guru', $id->id)
+                ->where('kelas.status', '!=', 'Deleted')
                 ->get();
             // return $bulan[0];
             $sharing =  Mengajar::where('mengajar.id_guru', $id->id)
@@ -226,6 +228,7 @@ class AuthController extends Controller
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                     ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                     ->where('kelas.id_siswa', $value->id)
+                    ->where('kelas.status', '!=', 'Deleted')
                     ->get();
                 foreach ($kelas_today as $key) {
                     array_push($kelas, $key);
