@@ -220,7 +220,12 @@ class AuthController extends Controller
             foreach ($siswa as $val) {
                 # code...
                 $tmp = PembayaranSPP::where('id_siswa', $val->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
-                $spp += $tmp->jumlah;
+                if ($tmp) {
+                    $spp += $tmp->jumlah;
+                } else {
+                    $spp = 0;
+                }
+
             }
 
 
