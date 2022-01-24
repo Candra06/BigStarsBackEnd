@@ -7,6 +7,7 @@ use App\Guru;
 use App\Http\Controllers\Controller;
 use App\Kelas;
 use App\Mengajar;
+use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,8 @@ class KelasController extends Controller
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
                     ->where('kelas.id_guru', $guru->id);
             } else {
-                $siswa = Guru::where('id_users', Auth::user()->id)->first();
+                $siswa = Walimurid::where('id_users', Auth::user()->id)->first();
+                // return $siswa;
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
@@ -58,7 +60,7 @@ class KelasController extends Controller
                 $dt = $dt->where('kelas.status', $request->status);
             }
             $result = $dt->get();
-
+            // return $result;
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $tmp['id'] = $key->id;
