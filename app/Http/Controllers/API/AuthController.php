@@ -54,7 +54,7 @@ class AuthController extends Controller
                         $data['alamat'] = $guru->alamat;
                         $data['birth_date'] = $guru->birth_date;
                         $data['id_users'] = $guru->id_users;
-                        $data['phone'] = $guru->phone;
+                        $data['phone'] = $user->phone;
                         $data['foto'] = $user->foto;
                         $data['role'] = $user->role;
                         $data['username'] = $user->username;
