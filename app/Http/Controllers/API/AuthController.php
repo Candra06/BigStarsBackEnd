@@ -159,7 +159,8 @@ class AuthController extends Controller
             $bulan = explode(" ", $mytime);
             $id = Guru::where('id_users',  Auth::user()->id)->first();
             $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
-            $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id)->count();
+            // return $id->id;
+            $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id->id)->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
             $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
             // return $fee;
