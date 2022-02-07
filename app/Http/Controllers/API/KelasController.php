@@ -250,6 +250,36 @@ class KelasController extends Controller
         }
     }
 
+    public function updateKelas(Request $request, $id)
+    {
+        $request->validate([
+            'id_mapel' => 'required',
+            'id_guru' => 'required',
+            'id_siswa' => 'required',
+            'spp' => 'required',
+            'fee_guru' => 'required',
+        ]);
+
+        try {
+            Kelas::where('id', $id)->update([
+                'id_mapel' => $request->id_mapel,
+                'id_guru' => $request->id_guru,
+                'id_siswa' => $request->id_siswa,
+                'spp' => $request->spp,
+                'fee_guru' => $request->fee_guru,
+            ]);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => $th,
+            ]);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *

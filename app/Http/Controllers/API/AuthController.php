@@ -105,6 +105,42 @@ class AuthController extends Controller
         }
     }
 
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $data = User::where('username', $request->username)->first();
+            if ($data) {
+                return response()->json(
+                    [
+                        'data' => 'Username terdaftar',
+                        'id' => $data->id
+                    ],
+                    200
+                );
+            } else {
+                return response()->json(['error' => 'Email dan Username tidak terdaftar'], 401);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'error' => $th,
+            ]);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            User::where('id', $request->id)->update(['password' => bcrypt($request->password)]);
+            return response()->json(['data' => 'Berhasil memperbarui password'], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'error' => $th,
+            ]);
+        }
+    }
+
     public function logout(Request $request)
     {
         try {
@@ -189,7 +225,7 @@ class AuthController extends Controller
             // return $sharing;
             if ($fee) {
                 $data['fee'] = $fee->jumlah;
-            }else{
+            } else {
                 $data['fee'] = 0;
             }
             $data['notif_unread'] = $notif;
@@ -218,15 +254,21 @@ class AuthController extends Controller
             $id = Walimurid::where('id_users',  Auth::user()->id)->first();
             $siswa = Siswa::where('id_wali', $id->id)->get();
             $spp = 0;
+            $kehadiran = 0;
             foreach ($siswa as $val) {
-                # code...
+                $tmpKehadiran = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                    ->where('kelas.id_siswa', $val->id)
+                    ->whereMonth('mengajar.created_at', date('m', strtotime($bulan[0])))
+                    ->count();
+                // return $tmpKehadiran;
+
                 $tmp = PembayaranSPP::where('id_siswa', $val->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
                 if ($tmp) {
                     $spp += $tmp->jumlah;
                 } else {
                     $spp = 0;
                 }
-
+                $kehadiran += $tmpKehadiran;
             }
 
 
@@ -247,6 +289,7 @@ class AuthController extends Controller
                     array_push($kelas, $key);
                 }
             }
+            $data['kehadiran'] = $kehadiran;
             $data['spp'] = $spp;
             $data['notif_unread'] = $notif;
             $data['kelas_today'] = $kelas;

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Mengajar;
 use App\Referal;
 use App\Siswa;
+use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SiswaController extends Controller
 {
@@ -46,6 +49,35 @@ class SiswaController extends Controller
         //
     }
 
+    public function listByWali()
+    {
+        try {
+            $id = Walimurid::where('id_users', Auth::user()->id)->first();
+            $siswa = Siswa::where('id_wali', $id->id)->where('status', 'Aktif')->get();
+            $data = [];
+            foreach ($siswa as $s) {
+                $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                ->where('kelas.id_siswa', $s->id)->sum('mengajar.poin_siswa');
+                $tmp['id'] = $s->id;
+                $tmp['nama'] = $s->nama;
+                $tmp['birth_date'] = $s->birth_date;
+                $tmp['poin_siswa'] = $poin->poin_siswa;
+                array_push($data, $tmp);
+            }
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed show data',
+                'error' => $th
+            ]);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -58,6 +90,7 @@ class SiswaController extends Controller
             $siswa['id_wali'] = $request->id_wali;
             $siswa['nama'] = $request->nama_siswa;
             $siswa['birth_date'] = $request->birth_date;
+            $wali['status'] = 'Aktif';
             Siswa::create($siswa);
             if($request->kode_referal) {
                 $idRef = Siswa::where('kode_referal', $request->kode_referal)->first();
@@ -90,10 +123,19 @@ class SiswaController extends Controller
     public function show($id)
     {
         try {
-            $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
+            $siswa = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
                 ->select('wali_siswa.nama as wali', 'wali_siswa.alamat', 'siswa.*')
                 ->where('siswa.id', $id)
                 ->first();
+            $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                ->where('kelas.id_siswa', $id)->sum('mengajar.poin_siswa');
+            $data['wali'] = $siswa->wali;
+            $data['alamat'] = $siswa->alamat;
+            $data['kode_referal'] = $siswa->kode_referal;
+            $data['nama'] = $siswa->nama;
+            $data['birth_date'] = $siswa->birth_date;
+            $data['status'] = $siswa->status;
+            $data['poin_siswa'] = $poin->poin_siswa;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',

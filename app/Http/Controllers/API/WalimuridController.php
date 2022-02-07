@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Siswa;
 use App\User;
 use App\Walimurid;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -24,6 +25,7 @@ class WalimuridController extends Controller
             $data = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
                 ->leftJoin('siswa', 'siswa.id_wali', 'wali_siswa.id')
                 ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
+                ->where('wali_siswa.status', '!=', 'Deleted')
                 ->get();
             return response()->json([
                 'status_code' => 200,
@@ -47,7 +49,7 @@ class WalimuridController extends Controller
     public function create(Request $request)
     {
         try {
-            
+
             $siswa['id_wali'] = $request->id_wali;
             $siswa['nama'] = $request->nama;
             $siswa['status'] = 'Aktif';
@@ -82,10 +84,12 @@ class WalimuridController extends Controller
             $wali['id_users'] = $inputUser->id;
             $wali['nama'] = $request->nama_wali;
             $wali['alamat'] = $request->alamat;
+            $wali['status'] = 'Active';
             $inputWali = Walimurid::create($wali);
             $siswa['id_wali'] = $inputWali->id;
             $siswa['nama'] = $request->nama_siswa;
             $siswa['birth_date'] = $request->birth_date;
+            $siswa['status'] = 'Aktif';
             Siswa::create($siswa);
             return response()->json([
                 'status_code' => 200,
@@ -183,6 +187,18 @@ class WalimuridController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            Walimurid::where('id', $id)->update(['status'=>'Deleted', 'updated_at'=>Carbon::now()]);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Failed create data',
+                'error' => $th
+            ]);
+        }
     }
 }

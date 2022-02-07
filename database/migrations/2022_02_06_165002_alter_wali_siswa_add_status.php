@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterWaliStatus extends Migration
+class AlterWaliSiswaAddStatus extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,6 @@ class AlterWaliStatus extends Migration
     public function up()
     {
         Schema::table('wali_siswa', function (Blueprint $table) {
-
             $table->enum('status', ['Active', 'Inactive', 'Deleted'])->default('Active');
         });
     }

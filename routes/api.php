@@ -46,6 +46,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/delete-jadwal/{id}', 'API\KelasController@destroy');
         Route::post('/create', 'API\KelasController@store');
         Route::post('/update/{id}', 'API\KelasController@update');
+        Route::post('/edit-kelas/{id}', 'API\KelasController@updateKelas');
         Route::get('/detail/{id}', 'API\KelasController@show');
         Route::get('/kehadiran-kelas/{id}', 'API\KelasController@kehadiranByKelas');
         Route::get('/filter-kelas/{siswa}/{guru}/{status}', 'API\KelasController@filterKelas');
@@ -68,6 +69,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/detail/{id}', 'API\SiswaController@show');
         Route::post('/update/{id}', 'API\SiswaController@update');
         Route::get('/delete/{id}', 'API\SiswaController@destroy');
+        Route::get('/delete-wali/{id}', 'API\WalimuridController@destroy');
     });
     Route::prefix('finance')->group(function () {
         Route::get('/index/{bulan}', 'API\PembayaranSppController@indexFinance');

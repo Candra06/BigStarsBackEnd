@@ -113,7 +113,9 @@ class MengajarController extends Controller
             $data = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
             ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
             ->select('mengajar.*', 'siswa.nama')
-            ->where('mengajar.id_guru', $id)->get();
+            ->where('mengajar.id_guru', $id)
+            ->orderBy('mengajar.created_at', 'DESC')
+            ->get();
             return response()->json([
                 'status_code' => 200,
                 'data' => $data
