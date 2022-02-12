@@ -279,11 +279,13 @@ class PembayaranSppController extends Controller
             $year = intval($month[0]) - 1;
             $b = $bulan == 0 ? 12 : $bulan;
             $y = $b == 12 ? $year : $month[0];
-
+            return $y . '-' . $b;
             $list = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                 ->leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                 ->select('mengajar.*', 'mapel.mapel', 'guru.nama')
+                ->where('kelas.id_siswa', $detail->id_siswa)
+
                 ->where('mengajar.created_at', 'LIKE', '%' . $y . '-' . $b . '%')->get();
 
             $data['no_invoice'] = $detail->no_invoice;
