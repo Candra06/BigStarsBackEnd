@@ -135,8 +135,8 @@ class PembayaranSppController extends Controller
                 $idSiswa = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                     ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->whereMonth('mengajar.created_at', Carbon::now()->subMonth()->month)
-                    ->select('siswa.id as id_siswa')
-                    ->groupBy('id_siswa')
+                    ->select('siswa.id')
+                    ->groupBy('id')
                     ->get();
                 // return $idSiswa;
                 $tmpTotalSpp = [];
@@ -146,7 +146,7 @@ class PembayaranSppController extends Controller
                 $a = 0;
                 for ($i = 0; $i < count($dt); $i++) {
                     if ($i > 0) {
-                        if ($dt[$i]['id_siswa'] == $dt[$i - 1]['id_siswa']) {
+                        if ($dt[$i]['id'] == $dt[$i - 1]['id']) {
                             $total += $dt[$i]['spp'];
                             // $tmpTotal = $total;
 
@@ -181,8 +181,8 @@ class PembayaranSppController extends Controller
                         $absen['keterangan'] = '-';
                     }
                     $now = Carbon::now();
-                    $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa[$i]->id_siswa;
-                    $absen['id_siswa'] = $idSiswa[$i]->id_siswa;
+                    $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa[$i]->id;
+                    $absen['id_siswa'] = $idSiswa[$i]->id;
                     $absen['tagihan_bulan'] = $now->format('Y-m-d');
                     $absen['status'] = 'Belum Lunas';
                     $absen['created_by'] = Auth::user()->id;
@@ -195,7 +195,6 @@ class PembayaranSppController extends Controller
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success',
-                    'data' => $absen
                 ]);
             }
         } catch (\Throwable $th) {
