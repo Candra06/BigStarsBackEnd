@@ -39,6 +39,8 @@ class MengajarController extends Controller
             $mengajar['file_materi'] = '-';
             $mengajar['materi'] = '-';
             $mengajar['jurnal'] = '-';
+            $mengajar['latitude'] = $request->latitude;
+            $mengajar['longitude'] = $request->longitude;
             $mengajar['created_at'] = Carbon::now();
             $mengajar['updated_at'] = Carbon::now();
             Mengajar::create($mengajar);
@@ -60,6 +62,8 @@ class MengajarController extends Controller
             'materi' => 'required',
             'jurnal' => 'required',
             'status' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
         ]);
         try {
             $mengajar = [];
@@ -70,6 +74,8 @@ class MengajarController extends Controller
                 $mengajar['spp'] = $spp;
                 $mengajar['fee_pengajar'] = $fee;
                 $mengajar['status'] = $request->status;
+                $mengajar['latitude'] = $request->latitude;
+                $mengajar['longitude'] = $request->longitude;
             } else {
                 if ($request->file_materi) {
                     $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
@@ -79,6 +85,8 @@ class MengajarController extends Controller
                 $mengajar['status'] = $request->status;
                 $mengajar['materi'] = $request->materi;
                 $mengajar['jurnal'] = $request->jurnal;
+                $mengajar['latitude'] = $request->latitude;
+                $mengajar['longitude'] = $request->longitude;
             }
             $mengajar['updated_at'] = Carbon::now();
 
@@ -104,18 +112,17 @@ class MengajarController extends Controller
      */
     public function create()
     {
-
     }
 
     public function absensi($id)
     {
         try {
             $data = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
-            ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
-            ->select('mengajar.*', 'siswa.nama')
-            ->where('mengajar.id_guru', $id)
-            ->orderBy('mengajar.created_at', 'DESC')
-            ->get();
+                ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                ->select('mengajar.*', 'siswa.nama')
+                ->where('mengajar.id_guru', $id)
+                ->orderBy('mengajar.created_at', 'DESC')
+                ->get();
             return response()->json([
                 'status_code' => 200,
                 'data' => $data
@@ -142,6 +149,8 @@ class MengajarController extends Controller
             'jurnal' => 'required',
             'status' => 'required',
             'poin' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
         ]);
         try {
             $idGuru = Guru::where('id_users', Auth::user()->id)->first();
@@ -158,13 +167,14 @@ class MengajarController extends Controller
                 $mengajar['fee_pengajar'] = $fee;
                 $mengajar['status'] = $request->status;
 
+                $mengajar['latitude'] = '-8.2074597';
+                $mengajar['longitude'] = '113.697264';
                 $mengajar['materi'] = '-';
                 $mengajar['jurnal'] = '-';
             } else {
                 if ($request->file_materi) {
                     $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
                     $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
-
                 }
                 $mengajar['spp'] = $data->spp;
                 $mengajar['fee_pengajar'] = $data->fee_guru;
@@ -173,6 +183,8 @@ class MengajarController extends Controller
                 $mengajar['materi'] = $request->materi;
                 $mengajar['jurnal'] = $request->jurnal;
                 $mengajar['status'] =  $request->status;
+                $mengajar['latitude'] = $request->latitude;
+                $mengajar['longitude'] = $request->longitude;
             }
             $mengajar['created_at'] = Carbon::now();
             $mengajar['updated_at'] = Carbon::now();
@@ -235,6 +247,8 @@ class MengajarController extends Controller
             $mengajar['file_materi'] = '-';
             $mengajar['materi'] = $request->materi;
             $mengajar['jurnal'] = $request->jurnal;
+            $mengajar['latitude'] = '-8.2074597';
+            $mengajar['longitude'] = '113.697264';
             $mengajar['created_at'] = $request->tglKelas;
             $mengajar['updated_at'] = $request->tglKelas;
             Mengajar::create($mengajar);
