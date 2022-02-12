@@ -279,7 +279,14 @@ class PembayaranSppController extends Controller
             $year = intval($month[0]) - 1;
             $b = $bulan == 0 ? 12 : $bulan;
             $y = $b == 12 ? $year : $month[0];
-            return $y . '-' . $b;
+
+            if ($b  < 10) {
+                $b = '0' . $b;
+            } else {
+                $b = $b;
+            }
+
+            // return $y . '-' . $b;
             $list = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                 ->leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
