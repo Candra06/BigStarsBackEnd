@@ -21,10 +21,27 @@ class SiswaController extends Controller
     public function index()
     {
         try {
-            $data = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
+            $data = [];
+            $siswa = Siswa::leftJoin('wali_siswa', 'siswa.id_wali', 'wali_siswa.id')
                 ->select('wali_siswa.nama as wali', 'wali_siswa.alamat', 'siswa.*')
                 ->where('siswa.status', '!=', 'Deleted')
                 ->get();
+            foreach ($siswa as $value) {
+                $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                    ->where('kelas.id_siswa', $value->id)->sum('mengajar.poin_siswa');
+                $tmp['id'] = $value->id;
+                $tmp['id_wali'] = $value->id_wali;
+                $tmp['wali'] = $value->wali;
+                $tmp['alamat'] = $value->alamat;
+                $tmp['kode_referal'] = $value->kode_referal;
+                $tmp['nama'] = $value->nama;
+                $tmp['birth_date'] = $value->birth_date;
+                $tmp['status'] = $value->status;
+                $tmp['created_at'] = $value->created_at;
+                $tmp['updated_at'] = $value->updated_at;
+                $tmp['poin_siswa'] = $poin;
+                array_push($data, $tmp);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -130,7 +147,7 @@ class SiswaController extends Controller
             $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->where('kelas.id_siswa', $id)->sum('mengajar.poin_siswa');
 
-            
+
             $data['wali'] = $siswa->wali;
             $data['alamat'] = $siswa->alamat;
             $data['kode_referal'] = $siswa->kode_referal;
