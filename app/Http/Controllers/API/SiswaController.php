@@ -129,13 +129,20 @@ class SiswaController extends Controller
                 ->first();
             $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->where('kelas.id_siswa', $id)->sum('mengajar.poin_siswa');
+
+
             $data['wali'] = $siswa->wali;
             $data['alamat'] = $siswa->alamat;
             $data['kode_referal'] = $siswa->kode_referal;
             $data['nama'] = $siswa->nama;
             $data['birth_date'] = $siswa->birth_date;
             $data['status'] = $siswa->status;
-            $data['poin_siswa'] = $poin->poin_siswa;
+            if ($poin) {
+                $data['poin_siswa'] = $poin->poin_siswa;
+            } else {
+                $data['poin_siswa'] = 0;
+            }
+
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
