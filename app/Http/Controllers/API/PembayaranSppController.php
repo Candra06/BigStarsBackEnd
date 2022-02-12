@@ -58,8 +58,6 @@ class PembayaranSppController extends Controller
         try {
             if (Carbon::now()->format('d') == '1') {
                 $this->create();
-            } else {
-                return 'sini';
             }
 
             DB::enableQueryLog();
@@ -91,7 +89,7 @@ class PembayaranSppController extends Controller
 
             $data = $query->get();
             $q = DB::getQueryLog();
-            return $q;
+            
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',

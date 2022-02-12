@@ -23,6 +23,9 @@ class PembayaranFeeController extends Controller
     public function index(Request $request)
     {
         try {
+            if (Carbon::now()->format('d') == '1') {
+                $this->create();
+            }
             $query = [];
             $role = Auth::user()->role;
 
