@@ -9,6 +9,7 @@ use App\PembayaranFEE;
 use App\PembayaranSPP;
 use App\Referal;
 use App\Siswa;
+use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -63,13 +64,17 @@ class PembayaranSppController extends Controller
             DB::enableQueryLog();
             $query = [];
             $role = Auth::user()->role;
+            // return $role;
             if ($role == 'Walimurid') {
-                $idSiswa = Siswa::where('id_wali', Auth::user()->id)->get();
+                $idWali = Walimurid::where('id_users',Auth::user()->id)->first();
+                $idSiswa = Siswa::where('id_wali', $idWali->id)->get();
+                // return $idSiswa;
                 foreach ($idSiswa as $id) {
                     $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                         ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
-                        ->where('siswa.id', $id->id);
+                        ->where('id_siswa', $id->id);
                 }
+
             } else {
                 $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                     ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*');
@@ -89,7 +94,7 @@ class PembayaranSppController extends Controller
 
             $data = $query->get();
             $q = DB::getQueryLog();
-            
+
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
