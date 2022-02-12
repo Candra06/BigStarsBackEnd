@@ -130,7 +130,7 @@ class SiswaController extends Controller
             $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->where('kelas.id_siswa', $id)->sum('mengajar.poin_siswa');
 
-            return $poin;
+            
             $data['wali'] = $siswa->wali;
             $data['alamat'] = $siswa->alamat;
             $data['kode_referal'] = $siswa->kode_referal;
