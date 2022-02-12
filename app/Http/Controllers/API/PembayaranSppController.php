@@ -56,6 +56,12 @@ class PembayaranSppController extends Controller
     public function index(Request $request)
     {
         try {
+            if ( Carbon::now()->format('d')) {
+                $this->create();
+            }else{
+                return 'sini';
+            }
+
             DB::enableQueryLog();
             $query = [];
             $role = Auth::user()->role;
