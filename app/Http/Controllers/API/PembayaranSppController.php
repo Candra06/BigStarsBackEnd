@@ -170,7 +170,7 @@ class PembayaranSppController extends Controller
                         $tmpTotalSpp[$a] = $total;
                     }
                 }
-                return $tmpTotalSpp;
+                // return $tmpTotalSpp;
                 $tmpTotal = 0;
                 for ($i = 0; $i < $m; $i++) {
                     $reff = Referal::where('reff_id',  $idSiswa[$i]->id_siswa)->where('status', 'Aktif')->count();
