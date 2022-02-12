@@ -56,9 +56,9 @@ class PembayaranSppController extends Controller
     public function index(Request $request)
     {
         try {
-            if ( Carbon::now()->format('d')) {
+            if (Carbon::now()->format('d') == '1') {
                 $this->create();
-            }else{
+            } else {
                 return 'sini';
             }
 
@@ -91,7 +91,7 @@ class PembayaranSppController extends Controller
 
             $data = $query->get();
             $q = DB::getQueryLog();
-            // return $data;
+            return $q;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
@@ -130,7 +130,7 @@ class PembayaranSppController extends Controller
                     ->select('siswa.id as id_siswa', 'mengajar.*')
                     ->orderBy('id_siswa')
                     ->get();
-                    // return Carbon::now()->subMonth()->month;
+                // return Carbon::now()->subMonth()->month;
                 // return $dt;
                 $m = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                     ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
