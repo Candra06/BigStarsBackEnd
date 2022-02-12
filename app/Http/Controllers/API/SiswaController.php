@@ -138,7 +138,7 @@ class SiswaController extends Controller
             $data['birth_date'] = $siswa->birth_date;
             $data['status'] = $siswa->status;
             if ($poin) {
-                $data['poin_siswa'] = $poin->poin_siswa;
+                $data['poin_siswa'] = $poin;
             } else {
                 $data['poin_siswa'] = 0;
             }
