@@ -57,7 +57,7 @@ class SiswaController extends Controller
             $data = [];
             foreach ($siswa as $s) {
                 $poin = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
-                ->where('kelas.id_siswa', $s->id)->sum('mengajar.poin_siswa');
+                    ->where('kelas.id_siswa', $s->id)->sum('mengajar.poin_siswa');
                 $tmp['id'] = $s->id;
                 $tmp['nama'] = $s->nama;
                 $tmp['birth_date'] = $s->birth_date;
@@ -92,7 +92,7 @@ class SiswaController extends Controller
             $siswa['birth_date'] = $request->birth_date;
             $wali['status'] = 'Aktif';
             Siswa::create($siswa);
-            if($request->kode_referal) {
+            if ($request->kode_referal) {
                 $idRef = Siswa::where('kode_referal', $request->kode_referal)->first();
                 $reff['reff_id'] = $idRef->id;
                 $reff['id_siswa'] = $request->id_siswa;
@@ -176,7 +176,7 @@ class SiswaController extends Controller
             $siswa['birth_date'] = $request->birth_date;
             Siswa::where('id', $id)->update($siswa);
             if ($request->status == 'Nonaktif') {
-                Referal::where('id_siswa', $id)->update(['status'=>'Inactive']);
+                Referal::where('id_siswa', $id)->update(['status' => 'Inactive']);
             }
             return response()->json([
                 'status_code' => 200,
@@ -201,7 +201,10 @@ class SiswaController extends Controller
     {
         try {
             Siswa::where('id', $id)->update(['status' => 'Deleted']);
-            Referal::where('id_siswa', $id)->update(['status'=>'Inactive']);
+            $reff =   Referal::where('id_siswa', $id)->count();
+            if ($reff > 0) {
+                Referal::where('id_siswa', $id)->update(['status' => 'Inactive']);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',

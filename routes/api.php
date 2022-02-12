@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', 'API\AuthController@login');
+Route::post('/lupa-password', 'API\AuthController@forgotPassword');
+Route::post('/reset-password', 'API\AuthController@resetPassword');
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
