@@ -172,10 +172,10 @@ class PembayaranSppController extends Controller
                 for ($i = 0; $i < $m; $i++) {
                     $reff = Referal::where('reff_id',  $idSiswa[$i]->id_siswa)->where('status', 'Aktif')->count();
                     if ($reff > 0) {
-                        $disc = $tmpTotalSpp[$i] * ($reff * 10) /100;
+                        $disc = $tmpTotalSpp[$i] * ($reff * 10) / 100;
                         $tmpTotal = $tmpTotalSpp[$i] - $disc;
                         $absen['jumlah'] = $tmpTotal;
-                        $absen['keterangan'] = 'Potongan '.($reff * 10).'% dari mengundang teman';
+                        $absen['keterangan'] = 'Potongan ' . ($reff * 10) . '% dari mengundang teman';
                     } else {
                         $absen['jumlah'] = $tmpTotalSpp[$i];
                         $absen['keterangan'] = '-';
@@ -267,12 +267,26 @@ class PembayaranSppController extends Controller
                 ->select('siswa.nama', 'pembayaran_spp.*')
                 ->where('pembayaran_spp.id', $id)
                 ->first();
+            // return $detail;
             $kelas = Kelas::where('id_siswa', $detail->id_siswa)->get();
             $total = 0;
             foreach ($kelas as $key) {
                 $mengajar = Mengajar::where('id_kelas', $key->id)->count();
                 $total += $mengajar;
             }
+            $list = [];
+            $month = explode('-', $detail->tagihan_bulan);
+            $bulan = intval($month[1]) - 1;
+            $year = intval($month[0]) - 1;
+            $b = $bulan == 0 ? 12 : $bulan;
+            $y = $b == 12 ? $year : $month[0];
+
+            $list = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                ->leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                ->select('mengajar.*', 'mapel.mapel', 'guru.nama')
+                ->where('mengajar.created_at', 'LIKE', '%' . $y . '-' . $b . '%')->get();
+
             $data['no_invoice'] = $detail->no_invoice;
             $data['nama'] = $detail->nama;
             $data['tagihan_bulan'] = $detail->tagihan_bulan;
@@ -281,6 +295,7 @@ class PembayaranSppController extends Controller
             $data['total_pertemuan'] = $total;
             $data['created_at'] = $detail->created_at;
             $data['udpated_at'] = $detail->udpated_at;
+            $data['histori_kehadiran'] = $list;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
