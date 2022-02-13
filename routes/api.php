@@ -68,6 +68,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/detail-wali/{id}', 'API\WalimuridController@show');
         Route::post('/update-wali/{id}', 'API\WalimuridController@update');
         Route::get('/list', 'API\SiswaController@index');
+        Route::get('/list-by-wali', 'API\SiswaController@listByWali');
         Route::post('/create-siswa', 'API\SiswaController@store');
         Route::get('/detail/{id}', 'API\SiswaController@show');
         Route::post('/update/{id}', 'API\SiswaController@update');
