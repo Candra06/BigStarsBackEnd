@@ -78,7 +78,7 @@ class SiswaController extends Controller
                 $tmp['id'] = $s->id;
                 $tmp['nama'] = $s->nama;
                 $tmp['birth_date'] = $s->birth_date;
-                $tmp['poin_siswa'] = $poin->poin_siswa;
+                $tmp['poin_siswa'] = $poin;
                 array_push($data, $tmp);
             }
             return response()->json([
