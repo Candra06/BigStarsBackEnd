@@ -23,7 +23,6 @@ class WalimuridController extends Controller
     {
         try {
             $data = Walimurid::leftJoin('users', 'users.id', 'wali_siswa.id_users')
-                ->leftJoin('siswa', 'siswa.id_wali', 'wali_siswa.id')
                 ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
                 ->where('wali_siswa.status', '!=', 'Deleted')
                 ->get();
