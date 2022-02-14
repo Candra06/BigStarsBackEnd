@@ -94,4 +94,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/list', 'API\NotifikasiController@index');
         Route::post('/read/{id}', 'API\NotifikasiController@readNotif');
     });
+
+    Route::prefix('rules')->group(function () {
+        Route::get('/list', 'API\RulesController@index');
+        Route::get('/detail', 'API\RulesController@detail');
+        Route::post('/update/{id}', 'API\RulesController@updateRules');
+        Route::post('/create', 'API\RulesController@postRules');
+    });
 });
