@@ -175,6 +175,8 @@ class MengajarController extends Controller
                 if ($request->file_materi != '-') {
                     $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
                     $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
+                }else{
+                    $mengajar['file_materi'] = '-';
                 }
                 $mengajar['spp'] = $data->spp;
                 $mengajar['fee_pengajar'] = $data->fee_guru;
