@@ -7,6 +7,7 @@ use App\Guru;
 use App\Http\Controllers\Controller;
 use App\Kelas;
 use App\Mengajar;
+use App\Siswa;
 use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -38,13 +39,50 @@ class KelasController extends Controller
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
                     ->where('kelas.id_guru', $guru->id);
             } else {
-                $siswa = Walimurid::where('id_users', Auth::user()->id)->first();
+                $wali = Walimurid::where('id_users', Auth::user()->id)->first();
+                // return $wali;
+                $siswa = Siswa::where('id_wali', $wali->id)->get();
                 // return $siswa;
-                $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                $tmpData = [];
+                foreach ($siswa as $key) {
+                    $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                    ->where('kelas.id_siswa', $siswa->id);
+
+                    ->where('kelas.id_siswa', $key->id)->get();
+                    // return $dt;
+                    for ($i=0; $i < count($dt); $i++) {
+                        # code...
+                        array_push($tmpData, $dt[$i]);
+                    }# code...
+                    // }
+                }
+                // return $tmpData;
+                foreach ($tmpData as $key) {
+                    $detail = DetailKelas::where('id_kelas', $key->id)->first();
+                    $tmp['id'] = $key->id;
+                    $tmp['guru'] = $key->guru;
+                    $tmp['siswa'] = $key->siswa;
+                    $tmp['mapel'] = $key->mapel;
+                    $tmp['id_mapel'] = $key->id_mapel;
+                    $tmp['id_guru'] = $key->id_guru;
+                    $tmp['id_siswa'] = $key->id_siswa;
+                    $tmp['spp'] = $key->spp;
+                    $tmp['fee_guru'] = $key->fee_guru;
+                    $tmp['status'] = $key->status;
+                    $tmp['jam_mulai'] = $detail->jam_mulai;
+                    $tmp['jam_selesai'] = $detail->jam_selesai;
+                    $tmp['created_at'] = $key->created_at;
+                    $tmp['updated_at'] = $key->updated_at;
+                    array_push($data, $tmp);
+                }
+                return response()->json([
+                    'status_code' => 200,
+                    'message' => 'Success',
+                    'data' => $data
+                ]);
+
             }
             $dt = $dt->where('kelas.status', '!=', 'Deleted');
             if ($request->siswa) {
@@ -350,6 +388,7 @@ class KelasController extends Controller
             $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                 ->where('mengajar.id_kelas', $id)
                 ->select('guru.nama', 'mengajar.*')
+                ->orderBy('mengajar.created_at', 'DESC')
                 ->get();
 
             return response()->json([

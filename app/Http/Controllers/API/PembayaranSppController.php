@@ -27,6 +27,9 @@ class PembayaranSppController extends Controller
     {
 
         try {
+            if (Carbon::now()->format('d') == '1' && Carbon::now()->format('d')) {
+                $this->create();
+            }
             $spp = PembayaranSPP::whereMonth('tagihan_bulan',  date('m', strtotime($bulan)))->where('status', 'Lunas')->get();
             $totalSpp = 0;
             foreach ($spp as $key) {
@@ -57,16 +60,14 @@ class PembayaranSppController extends Controller
     public function index(Request $request)
     {
         try {
-            if (Carbon::now()->format('d') == '1') {
-                $this->create();
-            }
+
 
             DB::enableQueryLog();
             $query = [];
             $role = Auth::user()->role;
             // return $role;
             if ($role == 'Walimurid') {
-                $idWali = Walimurid::where('id_users',Auth::user()->id)->first();
+                $idWali = Walimurid::where('id_users', Auth::user()->id)->first();
                 $idSiswa = Siswa::where('id_wali', $idWali->id)->get();
                 // return $idSiswa;
                 foreach ($idSiswa as $id) {
@@ -74,7 +75,6 @@ class PembayaranSppController extends Controller
                         ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
                         ->where('id_siswa', $id->id);
                 }
-
             } else {
                 $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                     ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*');
@@ -115,7 +115,9 @@ class PembayaranSppController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
+
     {
+
         try {
             $cek = PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->first();
 
@@ -195,7 +197,7 @@ class PembayaranSppController extends Controller
                     $now = Carbon::now();
                     $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa[$i]->id_siswa;
                     $absen['id_siswa'] = $idSiswa[$i]->id_siswa;
-                    $absen['tagihan_bulan'] = $now->format('Y-m-d');
+                    $absen['tagihan_bulan'] = Carbon::now()->subMonth()->format('Y-m-d');
                     $absen['status'] = 'Belum Lunas';
                     $absen['created_by'] = Auth::user()->id;
                     $absen['updated_by'] = Auth::user()->id;
@@ -274,18 +276,13 @@ class PembayaranSppController extends Controller
     public function show($id)
     {
         try {
+
+
             $detail = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                 ->select('siswa.nama', 'pembayaran_spp.*')
                 ->where('pembayaran_spp.id', $id)
                 ->first();
-            // return $detail;
-            $kelas = Kelas::where('id_siswa', $detail->id_siswa)->get();
-            $total = 0;
-            foreach ($kelas as $key) {
-                $mengajar = Mengajar::where('id_kelas', $key->id)->count();
-                $total += $mengajar;
-            }
-            $list = [];
+
             $month = explode('-', $detail->tagihan_bulan);
             $bulan = intval($month[1]) - 1;
             $year = intval($month[0]) - 1;
@@ -297,6 +294,16 @@ class PembayaranSppController extends Controller
             } else {
                 $b = $b;
             }
+            // return $detail;
+            $kelas = Kelas::where('id_siswa', $detail->id_siswa)->get();
+            $total = 0;
+            foreach ($kelas as $key) {
+                $mengajar = Mengajar::where('id_kelas', $key->id)
+                    ->where('created_at', 'LIKE', '%' . $y . '-' . $b . '%')
+                    ->count();
+                $total += $mengajar;
+            }
+            $list = [];
 
             // return $y . '-' . $b;
             $list = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
