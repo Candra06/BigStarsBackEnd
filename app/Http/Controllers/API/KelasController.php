@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\DetailKelas;
 use App\Guru;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Kelas;
 use App\Mengajar;
@@ -20,9 +21,66 @@ class KelasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function number_of_days($days, $start, $end)
+    {
+        $start = strtotime($start);
+        $end = strtotime($end);
+        $w = array(date('w', $start), date('w', $end));
+        $x = floor(($end - $start) / 604800);
+        $sum = 0;
+        for ($day = 0; $day < 7; ++$day) {
+            if ($days & pow(2, $day)) {
+                $sum += $x + ($w[0] > $w[1] ? $w[0] <= $day || $day <= $w[1] : $w[0] <= $day && $day <= $w[1]);
+            }
+        }
+        return $sum;
+    }
+
+    public function getWeeklyDayNumbers($startDate, $endDate, $day)
+    {
+        $count = 0;
+        switch ($day) {
+            case 'Senin':
+                $count += $this->number_of_days(0x02, $startDate, $endDate);
+                return $count;
+                break;
+            case 'Selasa':
+                $count += $this->number_of_days(0x04, $startDate, $endDate); // TUESDAY
+                return $count;
+                break;
+            case 'Rabu':
+                $count += $this->number_of_days(0x08, $startDate, $endDate); // WEDNESDAY
+                return $count;
+                break;
+            case 'Kamis':
+                $count += $this->number_of_days(0x10, $startDate, $endDate);
+                return $count;
+                break;
+            case 'Jum1at':
+                $count += $this->number_of_days(0x20, $startDate, $endDate);
+                return $count;
+                break;
+            case 'Sabtu':
+                $count += $this->number_of_days(0x40, $startDate, $endDate);
+                return $count;
+                break;
+            case 'Minggu':
+                $count += $this->number_of_days(0x01, $startDate, $endDate);
+                return $count;
+                break;
+
+            default:
+                return 'Unindexed';
+                break;
+        }
+    }
     public function index(Request $request)
     {
         try {
+            $start = date('01-m-Y');
+            $end  = date('t-m-Y');
+
             $data = [];
             $dt = [];
             // return $request;
@@ -46,25 +104,39 @@ class KelasController extends Controller
                 $tmpData = [];
                 foreach ($siswa as $key) {
                     $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
-                    ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
-                    ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                        ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
+                        ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                        ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
 
-                    ->where('kelas.id_siswa', $key->id)->get();
+                        ->where('kelas.id_siswa', $key->id)->get();
                     // return $dt;
-                    for ($i=0; $i < count($dt); $i++) {
+                    for ($i = 0; $i < count($dt); $i++) {
                         # code...
                         array_push($tmpData, $dt[$i]);
-                    }# code...
+                    } # code...
                     // }
                 }
                 // return $tmpData;
                 foreach ($tmpData as $key) {
+
+
                     $detail = DetailKelas::where('id_kelas', $key->id)->first();
+                    $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
+                    $jumlah = 0;
+                    $mengajar = Mengajar::where('id_kelas', $key->id)
+                        ->whereMonth('created_at', Carbon::now()->format('m'))
+                        ->count();
+                    // return $jumlahHari;
+                    foreach ($jumlahHari as $jh) {
+
+                        $jumlah += (int)$this->getWeeklyDayNumbers($start, $end, $jh->hari);
+                    }
+
                     $tmp['id'] = $key->id;
                     $tmp['guru'] = $key->guru;
                     $tmp['siswa'] = $key->siswa;
                     $tmp['mapel'] = $key->mapel;
+                    $tmp['jumlah_pertemuan'] = $mengajar . '/' . $jumlah;
                     $tmp['id_mapel'] = $key->id_mapel;
                     $tmp['id_guru'] = $key->id_guru;
                     $tmp['id_siswa'] = $key->id_siswa;
@@ -82,7 +154,6 @@ class KelasController extends Controller
                     'message' => 'Success',
                     'data' => $data
                 ]);
-
             }
             $dt = $dt->where('kelas.status', '!=', 'Deleted');
             if ($request->siswa) {
@@ -101,10 +172,22 @@ class KelasController extends Controller
             // return $result;
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
+                $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
+                $jumlah = 0;
+                $mengajar = Mengajar::where('id_kelas', $key->id)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->count();
+                // return $jumlahHari;
+                foreach ($jumlahHari as $jh) {
+
+                    $jumlah += (int)$this->getWeeklyDayNumbers($start, $end, $jh->hari);
+                }
+
                 $tmp['id'] = $key->id;
                 $tmp['guru'] = $key->guru;
                 $tmp['siswa'] = $key->siswa;
                 $tmp['mapel'] = $key->mapel;
+                $tmp['jumlah_pertemuan'] = $mengajar . '/' . $jumlah;
                 $tmp['id_mapel'] = $key->id_mapel;
                 $tmp['id_guru'] = $key->id_guru;
                 $tmp['id_siswa'] = $key->id_siswa;
@@ -115,7 +198,6 @@ class KelasController extends Controller
                 $tmp['jam_selesai'] = $detail->jam_selesai;
                 $tmp['created_at'] = $key->created_at;
                 $tmp['updated_at'] = $key->updated_at;
-                array_push($data, $tmp);
             }
             return response()->json([
                 'status_code' => 200,

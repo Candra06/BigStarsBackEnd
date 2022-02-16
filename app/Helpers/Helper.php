@@ -42,4 +42,6 @@ class Helper
         }
         return $randomString;
     }
+
+ 
 }
