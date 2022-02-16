@@ -179,7 +179,6 @@ class KelasController extends Controller
                     ->count();
                 // return $jumlahHari;
                 foreach ($jumlahHari as $jh) {
-
                     $jumlah += (int)$this->getWeeklyDayNumbers($start, $end, $jh->hari);
                 }
 
@@ -198,6 +197,7 @@ class KelasController extends Controller
                 $tmp['jam_selesai'] = $detail->jam_selesai;
                 $tmp['created_at'] = $key->created_at;
                 $tmp['updated_at'] = $key->updated_at;
+                array_push($data, $tmp);
             }
             return response()->json([
                 'status_code' => 200,
