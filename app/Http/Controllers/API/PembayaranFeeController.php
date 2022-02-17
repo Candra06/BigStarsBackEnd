@@ -163,10 +163,15 @@ class PembayaranFeeController extends Controller
 
             $queryFee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                 ->select('guru.nama', 'pembayaran_fee.*');
+
+            if ($request->nama) {
+                $queryFee = $queryFee->where('guru.nama',  'LIKE', '%' . $request->nama . '%');
+                $querySpp = $querySpp->where('siswa.nama',  'LIKE', '%' . $request->nama . '%');
+            }
             if ($request->bulan) {
-                if ((int)$request->bulan <10) {
-                    $bulan = '0'.$request->bulan;
-                }else{
+                if ((int)$request->bulan < 10) {
+                    $bulan = '0' . $request->bulan;
+                } else {
                     $bulan = $request->bulan;
                 }
                 $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $bulan);
@@ -176,10 +181,7 @@ class PembayaranFeeController extends Controller
                 $queryFee = $queryFee->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
                 $querySpp = $querySpp->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
             }
-            if ($request->nama) {
-                $queryFee = $queryFee->where('guru.nama',  'like', '%' . $request->nama . '%');
-                $querySpp = $querySpp->where('siswa.nama',  'like', '%' . $request->nama . '%');
-            }
+
             $spp = $querySpp->get();
             $fee = $queryFee->get();
             $q = DB::getQueryLog();
