@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\DemoCron;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\DemoCron::class,
+        DemoCron::class,
     ];
 
     /**
@@ -26,7 +27,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('demo:cron')
-            ->monthlyOn(1, '01:00');
+            ->monthlyOn(17, '13:12');
     }
 
     /**

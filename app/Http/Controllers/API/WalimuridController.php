@@ -88,6 +88,7 @@ class WalimuridController extends Controller
             $siswa['id_wali'] = $inputWali->id;
             $siswa['nama'] = $request->nama_siswa;
             $siswa['birth_date'] = $request->birth_date;
+            $siswa['kode_referal'] =  'BS'.Helper::generateRandomString(5);
             $siswa['status'] = 'Aktif';
             Siswa::create($siswa);
             return response()->json([
@@ -117,7 +118,7 @@ class WalimuridController extends Controller
                 ->select('wali_siswa.*', 'users.username', 'users.phone', 'users.status')
                 ->where('wali_siswa.id', $id)
                 ->first();
-            $siswa = Siswa::where('id_wali', $id)->get();
+            $siswa = Siswa::where('id_wali', $id)->where('status', 'Aktif')->get();
             $data['detail'] = $detail;
             $data['siswa'] = $siswa;
             return response()->json([

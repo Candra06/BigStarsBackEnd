@@ -27,9 +27,6 @@ class PembayaranSppController extends Controller
     {
 
         try {
-            if (Carbon::now()->format('d') == '1') {
-                $this->create();
-            }
             $spp = PembayaranSPP::whereMonth('tagihan_bulan',  date('m', strtotime($bulan)))->where('status', 'Lunas')->get();
             $totalSpp = 0;
             foreach ($spp as $key) {
