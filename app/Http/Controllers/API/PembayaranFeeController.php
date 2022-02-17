@@ -169,9 +169,8 @@ class PembayaranFeeController extends Controller
                 }else{
                     $bulan = $request->bulan;
                 }
-                return $bulan;
                 $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $bulan);
-                $$querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $bulan);
+                $querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $bulan);
             }
             if ($request->tahun) {
                 $queryFee = $queryFee->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
