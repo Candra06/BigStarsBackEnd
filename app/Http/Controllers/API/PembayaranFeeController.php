@@ -218,7 +218,7 @@ class PembayaranFeeController extends Controller
                 'data' => $dt
             ]);
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
