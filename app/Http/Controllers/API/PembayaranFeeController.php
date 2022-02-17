@@ -182,8 +182,8 @@ class PembayaranFeeController extends Controller
             }
             $spp = $querySpp->get();
             $fee = $queryFee->get();
-
-            // return $q;
+            $q = DB::getQueryLog();
+            return $q;
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
                 $tmp['tipe'] = 'SPP';
@@ -217,7 +217,7 @@ class PembayaranFeeController extends Controller
                 array_push($dt, $value);
             }
             // return $dt;
-            $q = DB::getQueryLog();
+
 
             return response()->json([
                 'status_code' => 200,
