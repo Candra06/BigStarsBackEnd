@@ -164,8 +164,13 @@ class PembayaranFeeController extends Controller
             $queryFee = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                 ->select('guru.nama', 'pembayaran_fee.*');
             if ($request->bulan) {
-                $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $request->bulan);
-                $$querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
+                if ((int)$request->bulan <10) {
+                    $bulan = '0'.$request->bulan;
+                }else{
+                    $bulan = $request->bulan;
+                }
+                $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $bulan);
+                $$querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $bulan);
             }
             if ($request->tahun) {
                 $queryFee = $queryFee->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
@@ -178,7 +183,7 @@ class PembayaranFeeController extends Controller
             $spp = $querySpp->get();
             $fee = $queryFee->get();
 
-            return $q;
+            // return $q;
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
                 $tmp['tipe'] = 'SPP';
@@ -219,7 +224,7 @@ class PembayaranFeeController extends Controller
                 'data' => $dt
             ]);
         } catch (\Throwable $th) {
-            throw $th;
+            return $th;
         }
     }
 
