@@ -157,10 +157,10 @@ class AuthController extends Controller
         try {
             $mytime = Carbon::now();
 
-            $kelas = Kelas::count();
-            $siswa = Siswa::count();
+            $kelas = Kelas::where('status','Active')->count();
+            $siswa = Siswa::where('status','Aktif')->count();
             $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
-            $guru = Guru::count();
+            $guru = Guru::where('status','Active')->count();
             $kelas_aktif = Kelas::where('status', 'Active')->count();
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
