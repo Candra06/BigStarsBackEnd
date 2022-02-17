@@ -170,7 +170,7 @@ class PembayaranFeeController extends Controller
                     $bulan = $request->bulan;
                 }
                 $queryFee = $queryFee->whereMonth('pembayaran_fee.tagihan_bulan',  $bulan);
-                $querySpp = $$querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $bulan);
+                $querySpp = $querySpp->whereMonth('pembayaran_spp.tagihan_bulan',  $bulan);
             }
             if ($request->tahun) {
                 $queryFee = $queryFee->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
@@ -218,7 +218,7 @@ class PembayaranFeeController extends Controller
             }
             // return $dt;
             $q = DB::getQueryLog();
-            
+
             return response()->json([
                 'status_code' => 200,
                 'data' => $dt
