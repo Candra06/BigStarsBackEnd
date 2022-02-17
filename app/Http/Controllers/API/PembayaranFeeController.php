@@ -176,7 +176,7 @@ class PembayaranFeeController extends Controller
             }
             $spp = $querySpp->get();
             $fee = $queryFee->get();
-            // $q = DB::getQueryLog();
+
             // return $q;
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
@@ -205,13 +205,14 @@ class PembayaranFeeController extends Controller
             $tmpData = collect($data);
             $sorted = $tmpData->sortBy('created_at', SORT_REGULAR, false);
             $dt = [];
-            return $sorted;
+            // return $sorted;
             foreach ($sorted as $key => $value) {
                 // $tmp['key'] = $value;
                 array_push($dt, $value);
             }
-            return $dt;
-
+            // return $dt;
+            $q = DB::getQueryLog();
+            return $q;
             return response()->json([
                 'status_code' => 200,
                 'data' => $dt
