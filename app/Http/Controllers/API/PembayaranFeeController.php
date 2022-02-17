@@ -218,7 +218,7 @@ class PembayaranFeeController extends Controller
             }
             // return $dt;
             $q = DB::getQueryLog();
-            return $q;
+            
             return response()->json([
                 'status_code' => 200,
                 'data' => $dt
