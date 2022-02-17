@@ -76,10 +76,13 @@ class MengajarController extends Controller
                 $mengajar['status'] = $request->status;
                 $mengajar['latitude'] = $request->latitude;
                 $mengajar['longitude'] = $request->longitude;
+                $mengajar['file_materi'] ='-';
             } else {
                 if ($request->file_materi) {
                     $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
                     $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
+                }else{
+                    $mengajar['file_materi'] ='-';
                 }
                 $mengajar['poin_siswa'] = $request->poin;
                 $mengajar['status'] = $request->status;
