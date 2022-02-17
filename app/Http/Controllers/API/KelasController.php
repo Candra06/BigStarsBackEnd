@@ -57,7 +57,7 @@ class KelasController extends Controller
                 $count += $this->number_of_days(0x10, $startDate, $endDate);
                 return $count;
                 break;
-            case 'Jum1at':
+            case 'Jum`at':
                 $count += $this->number_of_days(0x20, $startDate, $endDate);
                 return $count;
                 break;
