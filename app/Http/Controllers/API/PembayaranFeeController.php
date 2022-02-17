@@ -23,9 +23,6 @@ class PembayaranFeeController extends Controller
     public function index(Request $request)
     {
         try {
-            if (Carbon::now()->format('d') == '1') {
-                $this->create();
-            }
             $query = [];
             $role = Auth::user()->role;
 
@@ -212,7 +209,7 @@ class PembayaranFeeController extends Controller
                 // $tmp['key'] = $value;
                 array_push($dt, $value);
             }
-            // return $dt;
+            return $dt;
 
             return response()->json([
                 'status_code' => 200,
