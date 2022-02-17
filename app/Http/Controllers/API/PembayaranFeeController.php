@@ -155,6 +155,7 @@ class PembayaranFeeController extends Controller
     public function report(Request $request)
     {
         try {
+            return $request;
             DB::enableQueryLog();
             $data = [];
             $querySpp = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
