@@ -200,6 +200,7 @@ class SiswaController extends Controller
 
             $siswa['nama'] = $request->nama;
             $siswa['birth_date'] = $request->birth_date;
+            $siswa['status'] = $request->status;
             Siswa::where('id', $id)->update($siswa);
             if ($request->status == 'Nonaktif') {
                 Referal::where('id_siswa', $id)->update(['status' => 'Inactive']);
