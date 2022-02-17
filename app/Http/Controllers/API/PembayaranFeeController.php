@@ -177,7 +177,7 @@ class PembayaranFeeController extends Controller
             $spp = $querySpp->get();
             $fee = $queryFee->get();
 
-            // return $q;
+            return $q;
             foreach ($spp as $s) {
                 $tmp['id'] = $s->id;
                 $tmp['tipe'] = 'SPP';
