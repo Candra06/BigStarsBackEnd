@@ -205,6 +205,7 @@ class PembayaranFeeController extends Controller
             $tmpData = collect($data);
             $sorted = $tmpData->sortBy('created_at', SORT_REGULAR, false);
             $dt = [];
+            return $sorted;
             foreach ($sorted as $key => $value) {
                 // $tmp['key'] = $value;
                 array_push($dt, $value);
