@@ -37,14 +37,15 @@ class PembayaranFeeController extends Controller
                     ->select('guru.id as id_guru', 'guru.nama', 'pembayaran_fee.*');
                 // ->get();
             }
+            if ($request->nama) {
+                $query = $query->where('guru.nama',  'lIKE', '%' . $request->nama . '%');
+            }
+
             if ($request->bulan) {
                 $query = $query->whereMonth('pembayaran_fee.tagihan_bulan',  $request->bulan);
             }
             if ($request->tahun) {
                 $query = $query->whereYear('pembayaran_fee.tagihan_bulan',  $request->tahun);
-            }
-            if ($request->nama) {
-                $query = $query->where('guru.nama',  'like', '%' . $request->nama . '%');
             }
 
             $data = $query->get();
