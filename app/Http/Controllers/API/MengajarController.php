@@ -78,8 +78,9 @@ class MengajarController extends Controller
                 $mengajar['longitude'] = $request->longitude;
                 $mengajar['file_materi'] = '-';
             } else {
+                // return $request->file_materi
                 if ($request->file_materi) {
-                    if ($request->file_mater == '-') {
+                    if ($request->file_materi == '-') {
                         $mengajar['file_materi'] = '-';
                     } else {
                         $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
