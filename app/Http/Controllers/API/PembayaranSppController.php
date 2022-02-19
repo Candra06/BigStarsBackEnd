@@ -128,22 +128,22 @@ class PembayaranSppController extends Controller
                 $total = 0;
                 $dt = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                     ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
-                    ->whereMonth('mengajar.created_at', Carbon::now()->subMonth()->month)
+                    ->whereMonth('mengajar.created_at', Carbon::now())
                     ->select('siswa.id as id_siswa', 'mengajar.*')
                     ->orderBy('id_siswa')
                     ->get();
-                // return Carbon::now()->subMonth()->month;
+                // return Carbon::now();
                 // return $dt;
                 $m = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                     ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
-                    ->whereMonth('mengajar.created_at', Carbon::now()->subMonth()->month)
+                    ->whereMonth('mengajar.created_at', Carbon::now())
                     ->select('siswa.id as id_siswa', 'mengajar.*')
                     ->orderBy('id_siswa')
                     ->distinct()
                     ->count('id_siswa');
                 $idSiswa = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                     ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
-                    ->whereMonth('mengajar.created_at', Carbon::now()->subMonth()->month)
+                    ->whereMonth('mengajar.created_at', Carbon::now())
                     ->select('siswa.id as id_siswa')
                     ->groupBy('id_siswa')
                     ->get();
