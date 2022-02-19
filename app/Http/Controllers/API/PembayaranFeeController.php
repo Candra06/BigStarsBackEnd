@@ -81,16 +81,16 @@ class PembayaranFeeController extends Controller
                 $guru = Guru::all();
                 $absen = [];
                 $total = 0;
-                $dt = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                $dt = Mengajar::whereMonth('created_at', Carbon::now())
                     ->select('id_guru', 'fee_pengajar')
                     ->orderBy('id_guru')
                     ->get();
-                $m = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                $m = Mengajar::whereMonth('created_at', Carbon::now())
                     ->select('id_guru', 'fee_pengajar')
                     ->orderBy('id_guru')
                     ->distinct()
                     ->count('id_guru');
-                $idGuru = Mengajar::whereMonth('created_at', Carbon::now()->subMonth()->month)
+                $idGuru = Mengajar::whereMonth('created_at', Carbon::now())
                     ->select('id_guru')
                     ->orderBy('id_guru')
                     ->groupBy('id_guru')
