@@ -281,7 +281,7 @@ class PembayaranSppController extends Controller
                 ->first();
 
             $month = explode('-', $detail->tagihan_bulan);
-            $bulan = intval($month[1]) ;
+            $bulan = intval($month[1]) -1;
             $year = intval($month[0]);
             $b = $bulan == 0 ? 12 : $bulan;
             $y = $b == 12 ? $year : $month[0];
