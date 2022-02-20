@@ -319,6 +319,7 @@ class PembayaranSppController extends Controller
             $data['jumlah'] = $detail->jumlah;
             $data['status'] = $detail->status;
             $data['total_pertemuan'] = $total;
+            $data['keterangan'] = $detail->keterangan;
             $data['created_at'] = $detail->created_at;
             $data['udpated_at'] = $detail->udpated_at;
             $data['histori_kehadiran'] = $list;
