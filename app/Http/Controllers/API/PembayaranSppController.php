@@ -279,9 +279,9 @@ class PembayaranSppController extends Controller
                 ->select('siswa.nama', 'pembayaran_spp.*')
                 ->where('pembayaran_spp.id', $id)
                 ->first();
-
+            // return $detail;
             $month = explode('-', $detail->tagihan_bulan);
-            $bulan = intval($month[1]) -1;
+            $bulan = intval($month[1]) ;
             $year = intval($month[0]);
             $b = $bulan == 0 ? 12 : $bulan;
             $y = $b == 12 ? $year : $month[0];
@@ -291,26 +291,28 @@ class PembayaranSppController extends Controller
             } else {
                 $b = $b;
             }
-            // return $detail;
+            // return $y;
             $kelas = Kelas::where('id_siswa', $detail->id_siswa)->get();
             $total = 0;
             foreach ($kelas as $key) {
                 $mengajar = Mengajar::where('id_kelas', $key->id)
-                    ->where('created_at', 'LIKE', '%' . $y . '-' . $b . '%')
+                    ->whereMonth('created_at', $b)
+                    ->whereYear('created_at', $y)
                     ->count();
                 $total += $mengajar;
             }
             $list = [];
-
+            // return $total;
             // return $y . '-' . $b;
             $list = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                 ->leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                 ->select('mengajar.*', 'mapel.mapel', 'guru.nama')
                 ->where('kelas.id_siswa', $detail->id_siswa)
-
-                ->where('mengajar.created_at', 'LIKE', '%' . $y . '-' . $b . '%')->get();
-
+                ->whereMonth('mengajar.created_at', $b)
+                ->whereYear('mengajar.created_at', $y)
+                ->get();
+            // return $list;
             $data['no_invoice'] = $detail->no_invoice;
             $data['nama'] = $detail->nama;
             $data['tagihan_bulan'] = $detail->tagihan_bulan;
