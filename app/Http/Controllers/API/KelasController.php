@@ -480,7 +480,7 @@ class KelasController extends Controller
                     ->select('guru.nama', 'mengajar.*')
                     ->orderBy('mengajar.created_at', 'DESC')
                     ->get();
-                $kelas = Kelas::where('id_guru', $id_guru->id)->where('id', $id)->first();
+                $kelas = Kelas::where('id', $id)->first();
                 return $kelas;
                 if ($kelas->id_guru == $id_guru->id) {
                     $akses = true;
