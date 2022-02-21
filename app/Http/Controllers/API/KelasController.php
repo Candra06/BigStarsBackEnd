@@ -88,14 +88,16 @@ class KelasController extends Controller
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
-                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*');
+                    ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
+                    ->where('kelas.status', '!=', 'Deleted');
             } else if (Auth::user()->role == 'Guru') {
                 $guru = Guru::where('id_users', Auth::user()->id)->first();
                 $dt = Kelas::leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
                     ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                     ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                     ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-                    ->where('kelas.id_guru', $guru->id);
+                    ->where('kelas.id_guru', $guru->id)
+                    ->where('kelas.status', '!=', 'Deleted');
             } else {
                 $wali = Walimurid::where('id_users', Auth::user()->id)->first();
                 // return $wali;
@@ -107,7 +109,7 @@ class KelasController extends Controller
                         ->leftJoin('guru', 'guru.id', 'kelas.id_guru')
                         ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                         ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.*')
-
+                        ->where('kelas.status', '!=', 'Deleted')
                         ->where('kelas.id_siswa', $key->id)->get();
                     // return $dt;
                     for ($i = 0; $i < count($dt); $i++) {

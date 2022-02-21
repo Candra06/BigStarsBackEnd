@@ -157,8 +157,9 @@ class AuthController extends Controller
         try {
             $mytime = Carbon::now();
 
-            $kelas = Kelas::where('status','Active')->count();
+            $kelas = Kelas::where('status','Active')->where('status',  'Active')->count();
             $siswa = Siswa::where('status','Aktif')->count();
+            $wali = Walimurid::where('status','Active')->count();
             $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
             $guru = Guru::where('status','Active')->count();
             $kelas_aktif = Kelas::where('status', 'Active')->count();
@@ -174,7 +175,7 @@ class AuthController extends Controller
             $data['siswa'] = $siswa;
             $data['guru'] = $guru;
             $data['notif_unread'] = $notif;
-            $data['kelas_aktif'] = $kelas_aktif;
+            $data['wali'] = $wali;
             $data['kelas_today'] = $kelas_today;
             return response()->json([
                 'status_code' => 200,
@@ -196,7 +197,7 @@ class AuthController extends Controller
             $id = Guru::where('id_users',  Auth::user()->id)->first();
             $notif = NotifikasiDetail::where('id_penerima', Auth::user()->id)->where('status', 'Unread')->count();
             // return $id->id;
-            $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id->id)->count();
+            $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id->id)->where('status', '!=', 'Deleted')->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
             $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
             // return $fee;
