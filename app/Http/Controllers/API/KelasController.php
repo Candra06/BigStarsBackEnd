@@ -504,9 +504,6 @@ class KelasController extends Controller
 
             }
 
-            $data['akses_add'] = $akses;
-            $data['data'] = $tmpData;
-
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
