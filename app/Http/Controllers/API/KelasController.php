@@ -471,25 +471,27 @@ class KelasController extends Controller
         try {
             $role = Auth::user()->role;
             $data = [];
+            $tmpData = [];
             $akses = '';
             if ($role == 'Guru') {
                 $id_guru = Guru::where('id_users', Auth::user()->id)->first();
-                $data = $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
                     ->where('mengajar.id_guru', $id_guru->id)
                     ->select('guru.nama', 'mengajar.*')
                     ->orderBy('mengajar.created_at', 'DESC')
                     ->get();
                 $kelas = Kelas::where('id', $id)->first();
-                
+
                 if ($kelas->id_guru == $id_guru->id) {
                     $akses = true;
                 } else {
                     $akses = false;
                 }
 
+
             } else {
-                $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
                     ->select('guru.nama', 'mengajar.*')
                     ->orderBy('mengajar.created_at', 'DESC')
@@ -502,7 +504,8 @@ class KelasController extends Controller
 
             }
 
-
+            $data['akses_add'] = $akses;
+            $data['data'] = $tmpData;
 
             return response()->json([
                 'status_code' => 200,
