@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Kelas;
 use App\Mengajar;
 use App\Siswa;
+use App\User;
 use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -468,16 +469,44 @@ class KelasController extends Controller
     public function kehadiranByKelas($id)
     {
         try {
+            $role = Auth::user()->role;
+            $data = [];
+            $akses = '';
+            if ($role == 'Guru') {
+                $id_guru = Guru::where('id_users', Auth::user()->id)->first();
+                $data = $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                    ->where('mengajar.id_kelas', $id)
+                    ->where('mengajar.id_guru', $id_guru->id)
+                    ->select('guru.nama', 'mengajar.*')
+                    ->orderBy('mengajar.created_at', 'DESC')
+                    ->get();
+                $kelas = Kelas::where('id_guru', $id_guru->id)->where('id', $id)->first();
+                if ($kelas->id_guru == $id_guru->id) {
+                    $akses = true;
+                } else {
+                    $akses = false;
+                }
 
-            $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
-                ->where('mengajar.id_kelas', $id)
-                ->select('guru.nama', 'mengajar.*')
-                ->orderBy('mengajar.created_at', 'DESC')
-                ->get();
+            } else {
+                $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                    ->where('mengajar.id_kelas', $id)
+                    ->select('guru.nama', 'mengajar.*')
+                    ->orderBy('mengajar.created_at', 'DESC')
+                    ->get();
+                if ($role == 'Admin') {
+                    $akses = true;
+                } else {
+                    $akses = false;
+                }
+
+            }
+
+
 
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
+                'akses_add' => $akses,
                 'data' => $data
             ]);
         } catch (\Throwable $th) {
