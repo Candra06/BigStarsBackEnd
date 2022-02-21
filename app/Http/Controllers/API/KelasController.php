@@ -510,6 +510,7 @@ class KelasController extends Controller
                 'data' => $data
             ]);
         } catch (\Throwable $th) {
+            return $th;
             return response()->json([
                 'status_code' => 401,
                 'message' => $th,
