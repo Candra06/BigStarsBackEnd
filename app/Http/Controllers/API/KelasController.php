@@ -475,7 +475,7 @@ class KelasController extends Controller
             $akses = '';
             if ($role == 'Guru') {
                 $id_guru = Guru::where('id_users', Auth::user()->id)->first();
-                $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
                     ->where('mengajar.id_guru', $id_guru->id)
                     ->select('guru.nama', 'mengajar.*')
@@ -491,7 +491,7 @@ class KelasController extends Controller
 
 
             } else {
-                $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
+                $data = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
                     ->select('guru.nama', 'mengajar.*')
                     ->orderBy('mengajar.created_at', 'DESC')
