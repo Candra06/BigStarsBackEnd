@@ -8,6 +8,7 @@ use App\Kelas;
 use App\Mengajar;
 use App\PembayaranFEE;
 use App\PembayaranSPP;
+use App\Referal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,11 +110,20 @@ class MengajarController extends Controller
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
             $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
             $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-            // return $tmpFee;
-            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+            // cek apakah ada referal
+            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+            $jumlahSpp =  (int)$result->spp;
+            // percabangan ketika ada data atau tidak
+            if ($reff > 0) {
+                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+            } else {
+                $jumlahSpp = (int)$result->spp;
+            }
+            // menghitung jumlah tagihan
+            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
             $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
 
             return response()->json([
                 'status_code' => 200,
@@ -215,16 +225,26 @@ class MengajarController extends Controller
             $mengajar['updated_at'] = Carbon::now();
 
 
-            $result=Mengajar::create($mengajar);
+            $result = Mengajar::create($mengajar);
             // return $result;
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
             $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
             $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
             // return $tmpFee;
-            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+            // cek apakah ada referal
+            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+            $jumlahSpp =  (int)$result->spp;
+            // percabangan ketika ada data atau tidak
+            if ($reff > 0) {
+                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+            } else {
+                $jumlahSpp = (int)$result->spp;
+            }
+            // menghitung jumlah tagihan
+            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
             $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
 
             return response()->json([
                 'status_code' => 200,
@@ -287,14 +307,29 @@ class MengajarController extends Controller
             $mengajar['created_at'] = $request->tglKelas;
             $mengajar['updated_at'] = $request->tglKelas;
             $result = Mengajar::create($mengajar);
+            // select data siswa berdasarkan kelas
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+
+            // get data tagihan
             $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
             $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-            // return $tmpFee;
-            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+
+            // cek apakah ada referal
+            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+            $jumlahSpp =  (int)$result->spp;
+            // percabangan ketika ada data atau tidak
+            if ($reff > 0) {
+                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+            } else {
+                $jumlahSpp = (int)$result->spp;
+            }
+            // menghitung jumlah tagihan
+            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
             $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
+
+            // update jumlah tagihan
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
@@ -315,6 +350,22 @@ class MengajarController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $result = Mengajar::where('id', $id)->first();
+            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+            $upSpp = (int)$tmpSpp->jumlah - (int)$result->spp;
+            $upFee = (int)$tmpFee->jumlah - (int)$result->fee_pengajar;
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+            Mengajar::where('id', $id)->delete();
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

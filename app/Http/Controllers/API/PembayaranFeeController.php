@@ -70,80 +70,95 @@ class PembayaranFeeController extends Controller
     public function create()
     {
         try {
-            $cek = PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->first();
 
-            if ($cek) {
-                return response()->json([
-                    'status_code' => 400,
-                    'message' => 'Tagihan sudah ada'
-                ]);
-            } else {
-                $guru = Guru::all();
-                $absen = [];
-                $total = 0;
-                $dt = Mengajar::whereMonth('created_at', Carbon::now())
-                    ->select('id_guru', 'fee_pengajar')
-                    ->orderBy('id_guru')
-                    ->get();
-                $m = Mengajar::whereMonth('created_at', Carbon::now())
-                    ->select('id_guru', 'fee_pengajar')
-                    ->orderBy('id_guru')
-                    ->distinct()
-                    ->count('id_guru');
-                $idGuru = Mengajar::whereMonth('created_at', Carbon::now())
-                    ->select('id_guru')
-                    ->orderBy('id_guru')
-                    ->groupBy('id_guru')
-                    ->get();
-                // return $idGuru;
-                $tmpTotalFee = [];
-                for ($i = 0; $i < $m; $i++) {
-                    array_push($tmpTotalFee, 0);
-                }
-                $a = 0;
+            $guru = Guru::where('status', 'Active')->get();
+            foreach ($guru as $key) {
+                $now = Carbon::now();
+                $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $key->id;
+                $absen['id_guru'] = $key->id;
+                $absen['jumlah'] = 0;
+                $absen['tagihan_bulan'] = $now->format('Y-m-d');
+                $absen['status'] = 'Belum Lunas';
+                $absen['created_by'] = Auth::user()->id;
+                $absen['updated_by'] = Auth::user()->id;
+                $absen['created_at'] = $now;
+                $absen['updated_at'] = $now;
+                PembayaranFEE::create($absen);
+            }
+            // $cek = PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->first();
 
-                for ($i = 0; $i < count($dt); $i++) {
-                    if ($i > 0) {
-                        if ($dt[$i]['id_guru'] == $dt[$i - 1]['id_guru']) {
-                            $total += $dt[$i]['fee_pengajar'];
-                            if ($i == count($dt) - 1) {
-                                $tmpTotalFee[$a] = $total;
-                            }
-                        } else {
-                            $tmpTotalFee[$a] = $total;
-                            $total = $dt[$i]['fee_pengajar'];
-                            $a++;
-                            if ($i == count($dt) - 1) {
-                                $tmpTotalFee[$a] = $total;
-                            }
-                        }
-                    } else {
-                        $total = $dt[$i]['fee_pengajar'];
-                    }
-                }
-                // return $tmpTotalFee; value fee pengajar
+            // if ($cek) {
+            //     return response()->json([
+            //         'status_code' => 400,
+            //         'message' => 'Tagihan sudah ada'
+            //     ]);
+            // } else {
+            //     $guru = Guru::all();
+            //     $absen = [];
+            //     $total = 0;
+            //     $dt = Mengajar::whereMonth('created_at', Carbon::now())
+            //         ->select('id_guru', 'fee_pengajar')
+            //         ->orderBy('id_guru')
+            //         ->get();
+            //     $m = Mengajar::whereMonth('created_at', Carbon::now())
+            //         ->select('id_guru', 'fee_pengajar')
+            //         ->orderBy('id_guru')
+            //         ->distinct()
+            //         ->count('id_guru');
+            //     $idGuru = Mengajar::whereMonth('created_at', Carbon::now())
+            //         ->select('id_guru')
+            //         ->orderBy('id_guru')
+            //         ->groupBy('id_guru')
+            //         ->get();
+            //     // return $idGuru;
+            //     $tmpTotalFee = [];
+            //     for ($i = 0; $i < $m; $i++) {
+            //         array_push($tmpTotalFee, 0);
+            //     }
+            //     $a = 0;
 
-                for ($i = 0; $i < $m; $i++) {
+            //     for ($i = 0; $i < count($dt); $i++) {
+            //         if ($i > 0) {
+            //             if ($dt[$i]['id_guru'] == $dt[$i - 1]['id_guru']) {
+            //                 $total += $dt[$i]['fee_pengajar'];
+            //                 if ($i == count($dt) - 1) {
+            //                     $tmpTotalFee[$a] = $total;
+            //                 }
+            //             } else {
+            //                 $tmpTotalFee[$a] = $total;
+            //                 $total = $dt[$i]['fee_pengajar'];
+            //                 $a++;
+            //                 if ($i == count($dt) - 1) {
+            //                     $tmpTotalFee[$a] = $total;
+            //                 }
+            //             }
+            //         } else {
+            //             $total = $dt[$i]['fee_pengajar'];
+            //         }
+            //     }
+            //     // return $tmpTotalFee; value fee pengajar
 
-                    $now = Carbon::now();
-                    $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $idGuru[$i]->id_guru;
-                    $absen['id_guru'] = $idGuru[$i]->id_guru;
-                    $absen['jumlah'] = $tmpTotalFee[$i];
-                    $absen['tagihan_bulan'] = $now->format('Y-m-d');
-                    $absen['status'] = 'Belum Lunas';
-                    $absen['created_by'] = Auth::user()->id;
-                    $absen['updated_by'] = Auth::user()->id;
-                    $absen['created_at'] = $now;
-                    $absen['updated_at'] = $now;
-                    PembayaranFEE::create($absen);
-                }
+            //     for ($i = 0; $i < $m; $i++) {
+
+            //         $now = Carbon::now();
+            //         $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $idGuru[$i]->id_guru;
+            //         $absen['id_guru'] = $idGuru[$i]->id_guru;
+            //         $absen['jumlah'] = $tmpTotalFee[$i];
+            //         $absen['tagihan_bulan'] = $now->format('Y-m-d');
+            //         $absen['status'] = 'Belum Lunas';
+            //         $absen['created_by'] = Auth::user()->id;
+            //         $absen['updated_by'] = Auth::user()->id;
+            //         $absen['created_at'] = $now;
+            //         $absen['updated_at'] = $now;
+            //         PembayaranFEE::create($absen);
+            //     }
 
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success',
                     'data' => $absen
                 ]);
-            }
+            // }
         } catch (\Throwable $th) {
             return $th;
             return response()->json([
