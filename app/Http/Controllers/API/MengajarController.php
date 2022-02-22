@@ -6,6 +6,8 @@ use App\Guru;
 use App\Http\Controllers\Controller;
 use App\Kelas;
 use App\Mengajar;
+use App\PembayaranFEE;
+use App\PembayaranSPP;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +69,9 @@ class MengajarController extends Controller
         ]);
         try {
             $mengajar = [];
+            $fee = [];
+            $spp = [];
+
             if ($request->status == 'Cancel') {
                 $data = Mengajar::where('id', $id)->first();
                 $spp = $data->spp / 2;
@@ -99,7 +104,17 @@ class MengajarController extends Controller
             $mengajar['updated_at'] = Carbon::now();
 
 
-            Mengajar::where('id', $id)->update($mengajar);
+            $result = Mengajar::where('id', $id)->update($mengajar);
+
+            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+            // return $tmpFee;
+            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
+
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
@@ -200,7 +215,17 @@ class MengajarController extends Controller
             $mengajar['updated_at'] = Carbon::now();
 
 
-            Mengajar::create($mengajar);
+            $result=Mengajar::create($mengajar);
+            // return $result;
+            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+            // return $tmpFee;
+            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
+
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
@@ -261,7 +286,15 @@ class MengajarController extends Controller
             $mengajar['longitude'] = '113.697264';
             $mengajar['created_at'] = $request->tglKelas;
             $mengajar['updated_at'] = $request->tglKelas;
-            Mengajar::create($mengajar);
+            $result = Mengajar::create($mengajar);
+            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+            // return $tmpFee;
+            $upSpp = (int)$tmpSpp->jumlah + (int)$result->spp;
+            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah'=> $upSpp]);
+            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah'=> $upFee]);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'

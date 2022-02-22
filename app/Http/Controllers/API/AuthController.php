@@ -199,7 +199,7 @@ class AuthController extends Controller
             // return $id->id;
             $kelas_aktif = Kelas::where('status', 'Active')->where('id_guru', $id->id)->where('status', '!=', 'Deleted')->count();
             // $fee = Mengajar::where('id_guru', $id->id)->whereMonth('created_at', date('m', strtotime($bulan[0])))->sum('fee_pengajar');
-            $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
+            $fee = PembayaranFEE::where('id_guru', $id->id)->whereMonth('tagihan_bulan', Carbon::now()->format('m'))->first();
             // return $fee;
             $kelas_today = DetailKelas::leftJoin('kelas', 'kelas.id', 'detail_kelas.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
@@ -263,7 +263,7 @@ class AuthController extends Controller
                     ->count();
                 // return $tmpKehadiran;
 
-                $tmp = PembayaranSPP::where('id_siswa', $val->id)->whereMonth('tagihan_bulan', date('m', strtotime($bulan[0])))->first();
+                $tmp = PembayaranSPP::where('id_siswa', $val->id)->whereMonth('tagihan_bulan', Carbon::now()->format('m'))->first();
                 if ($tmp) {
                     $spp += $tmp->jumlah;
                 } else {
