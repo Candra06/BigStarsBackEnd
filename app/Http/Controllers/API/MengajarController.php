@@ -78,7 +78,7 @@ class MengajarController extends Controller
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
-                ]);
+                ], 402);
             } else {
                 $mengajar = [];
                 $fee = [];
