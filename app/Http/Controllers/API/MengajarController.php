@@ -257,7 +257,7 @@ class MengajarController extends Controller
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-                return $tmpFee;
+                // return $tmpFee;
                 // cek apakah ada referal
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$result->spp;
@@ -271,7 +271,7 @@ class MengajarController extends Controller
                 $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
                 $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
                 PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-                PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
 
                 return response()->json([
                     'status_code' => 200,
