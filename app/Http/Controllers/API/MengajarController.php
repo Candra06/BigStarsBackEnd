@@ -137,7 +137,7 @@ class MengajarController extends Controller
                 $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
                 $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
                 PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-                PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
 
                 return response()->json([
                     'status_code' => 200,
@@ -369,7 +369,7 @@ class MengajarController extends Controller
 
             // update jumlah tagihan
             PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+            PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
@@ -398,7 +398,7 @@ class MengajarController extends Controller
             $upSpp = (int)$tmpSpp->jumlah - (int)$result->spp;
             $upFee = (int)$tmpFee->jumlah - (int)$result->fee_pengajar;
             PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+            PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
             Mengajar::where('id', $id)->delete();
             return response()->json([
                 'status_code' => 200,
