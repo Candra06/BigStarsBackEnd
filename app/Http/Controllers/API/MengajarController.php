@@ -74,72 +74,73 @@ class MengajarController extends Controller
             $date->toDateTimeString();
             $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
             // cek apakah jam melebihi jam 9 malamm
-            if ($newDateTime >= strtotime("21:00")) {
+            if (strtotime($newDateTime) >= strtotime("14:00")) {
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
                 ]);
-            }
-            $mengajar = [];
-            $fee = [];
-            $spp = [];
-
-            if ($request->status == 'Cancel') {
-                $data = Mengajar::where('id', $id)->first();
-                $spp = $data->spp / 2;
-                $fee = 10000;
-                $mengajar['spp'] = $spp;
-                $mengajar['fee_pengajar'] = $fee;
-                $mengajar['status'] = $request->status;
-                $mengajar['latitude'] = $request->latitude;
-                $mengajar['longitude'] = $request->longitude;
-                $mengajar['file_materi'] = '-';
             } else {
-                // return $request->file_materi
-                if ($request->file_materi) {
-                    if ($request->file_materi == '-') {
-                        $mengajar['file_materi'] = '-';
-                    } else {
-                        $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
-                        $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
-                    }
-                } else {
+                $mengajar = [];
+                $fee = [];
+                $spp = [];
+
+                if ($request->status == 'Cancel') {
+                    $data = Mengajar::where('id', $id)->first();
+                    $spp = $data->spp / 2;
+                    $fee = 10000;
+                    $mengajar['spp'] = $spp;
+                    $mengajar['fee_pengajar'] = $fee;
+                    $mengajar['status'] = $request->status;
+                    $mengajar['latitude'] = $request->latitude;
+                    $mengajar['longitude'] = $request->longitude;
                     $mengajar['file_materi'] = '-';
+                } else {
+                    // return $request->file_materi
+                    if ($request->file_materi) {
+                        if ($request->file_materi == '-') {
+                            $mengajar['file_materi'] = '-';
+                        } else {
+                            $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
+                            $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
+                        }
+                    } else {
+                        $mengajar['file_materi'] = '-';
+                    }
+                    $mengajar['poin_siswa'] = $request->poin;
+                    $mengajar['status'] = $request->status;
+                    $mengajar['materi'] = $request->materi;
+                    $mengajar['jurnal'] = $request->jurnal;
+                    $mengajar['latitude'] = $request->latitude;
+                    $mengajar['longitude'] = $request->longitude;
                 }
-                $mengajar['poin_siswa'] = $request->poin;
-                $mengajar['status'] = $request->status;
-                $mengajar['materi'] = $request->materi;
-                $mengajar['jurnal'] = $request->jurnal;
-                $mengajar['latitude'] = $request->latitude;
-                $mengajar['longitude'] = $request->longitude;
+                $mengajar['updated_at'] = Carbon::now();
+
+
+                $result = Mengajar::where('id', $id)->update($mengajar);
+
+                $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+                $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+                $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+                // cek apakah ada referal
+                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                $jumlahSpp =  (int)$result->spp;
+                // percabangan ketika ada data atau tidak
+                if ($reff > 0) {
+                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                } else {
+                    $jumlahSpp = (int)$result->spp;
+                }
+                // menghitung jumlah tagihan
+                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+
+                return response()->json([
+                    'status_code' => 200,
+                    'message' => 'Success'
+                ]);
             }
-            $mengajar['updated_at'] = Carbon::now();
-
-
-            $result = Mengajar::where('id', $id)->update($mengajar);
-
-            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
-            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
-            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-            // cek apakah ada referal
-            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-            $jumlahSpp =  (int)$result->spp;
-            // percabangan ketika ada data atau tidak
-            if ($reff > 0) {
-                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
-            } else {
-                $jumlahSpp = (int)$result->spp;
-            }
-            // menghitung jumlah tagihan
-            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
-
-            return response()->json([
-                'status_code' => 200,
-                'message' => 'Success'
-            ]);
         } catch (\Throwable $th) {
             return $th;
             return response()->json([
@@ -202,76 +203,79 @@ class MengajarController extends Controller
             $date->toDateTimeString();
             $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
             // cek apakah jam melebihi jam 9 malamm
-            if ($newDateTime >= strtotime("13:00")) {
+            // return strtotime("13:00");
+            if (strtotime($newDateTime) >= strtotime("13:00")) {
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
                 ]);
-            }
-            $idGuru = Guru::where('id_users', Auth::user()->id)->first();
+            }else{
+                $idGuru = Guru::where('id_users', Auth::user()->id)->first();
 
-            $mengajar = [];
-            $data = Kelas::where('id', $idKelas)->first();
-            $mengajar['id_guru'] = $idGuru->id;
-            $mengajar['id_kelas'] = $data->id;
-            $mengajar['tipe'] = 'Asli';
-            if ($request->status == 'Cancel') {
-                $spp = $data->spp / 2;
-                $fee = 10000;
-                $mengajar['spp'] = $spp;
-                $mengajar['fee_pengajar'] = $fee;
-                $mengajar['status'] = $request->status;
+                $mengajar = [];
+                $data = Kelas::where('id', $idKelas)->first();
+                $mengajar['id_guru'] = $idGuru->id;
+                $mengajar['id_kelas'] = $data->id;
+                $mengajar['tipe'] = 'Asli';
+                if ($request->status == 'Cancel') {
+                    $spp = $data->spp / 2;
+                    $fee = 10000;
+                    $mengajar['spp'] = $spp;
+                    $mengajar['fee_pengajar'] = $fee;
+                    $mengajar['status'] = $request->status;
 
-                $mengajar['latitude'] = '-8.2074597';
-                $mengajar['longitude'] = '113.697264';
-                $mengajar['materi'] = '-';
-                $mengajar['jurnal'] = '-';
-            } else {
-                if ($request->file_materi != '-') {
-                    $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
-                    $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
+                    $mengajar['latitude'] = '-8.2074597';
+                    $mengajar['longitude'] = '113.697264';
+                    $mengajar['materi'] = '-';
+                    $mengajar['jurnal'] = '-';
                 } else {
-                    $mengajar['file_materi'] = '-';
+                    if ($request->file_materi != '-') {
+                        $name = str_replace(" ", "_", $request->file_materi->getClientOriginalName());
+                        $mengajar['file_materi'] = Storage::putFileAs('materi', $request->file('file_materi'), $name);
+                    } else {
+                        $mengajar['file_materi'] = '-';
+                    }
+                    $mengajar['spp'] = $data->spp;
+                    $mengajar['fee_pengajar'] = $data->fee_guru;
+                    $mengajar['poin_siswa'] = $request->poin;
+                    $mengajar['status'] = $request->status;
+                    $mengajar['materi'] = $request->materi;
+                    $mengajar['jurnal'] = $request->jurnal;
+                    $mengajar['status'] =  $request->status;
+                    $mengajar['latitude'] = $request->latitude;
+                    $mengajar['longitude'] = $request->longitude;
                 }
-                $mengajar['spp'] = $data->spp;
-                $mengajar['fee_pengajar'] = $data->fee_guru;
-                $mengajar['poin_siswa'] = $request->poin;
-                $mengajar['status'] = $request->status;
-                $mengajar['materi'] = $request->materi;
-                $mengajar['jurnal'] = $request->jurnal;
-                $mengajar['status'] =  $request->status;
-                $mengajar['latitude'] = $request->latitude;
-                $mengajar['longitude'] = $request->longitude;
+                $mengajar['created_at'] = Carbon::now();
+                $mengajar['updated_at'] = Carbon::now();
+
+
+                $result = Mengajar::create($mengajar);
+                // return $result;
+                $idSiswa = Kelas::where('id', $result->id_kelas)->first();
+                $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
+                $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+                // return $tmpFee;
+                // cek apakah ada referal
+                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                $jumlahSpp =  (int)$result->spp;
+                // percabangan ketika ada data atau tidak
+                if ($reff > 0) {
+                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                } else {
+                    $jumlahSpp = (int)$result->spp;
+                }
+                // menghitung jumlah tagihan
+                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
+
+                return response()->json([
+                    'status_code' => 200,
+                    'message' => 'Success'
+                ]);
             }
-            $mengajar['created_at'] = Carbon::now();
-            $mengajar['updated_at'] = Carbon::now();
 
-
-            $result = Mengajar::create($mengajar);
-            // return $result;
-            $idSiswa = Kelas::where('id', $result->id_kelas)->first();
-            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
-            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-            // return $tmpFee;
-            // cek apakah ada referal
-            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-            $jumlahSpp =  (int)$result->spp;
-            // percabangan ketika ada data atau tidak
-            if ($reff > 0) {
-                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
-            } else {
-                $jumlahSpp = (int)$result->spp;
-            }
-            // menghitung jumlah tagihan
-            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-            PembayaranFEE::where('id', $tmpSpp->id)->update(['jumlah' => $upFee]);
-
-            return response()->json([
-                'status_code' => 200,
-                'message' => 'Success'
-            ]);
         } catch (\Throwable $th) {
             return $th;
             return response()->json([
@@ -318,7 +322,7 @@ class MengajarController extends Controller
             $date->toDateTimeString();
             $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
             // cek apakah jam melebihi jam 9 malamm
-            if ($newDateTime >= strtotime("12:10")) {
+            if (strtotime($newDateTime) >= strtotime("12:10")) {
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
