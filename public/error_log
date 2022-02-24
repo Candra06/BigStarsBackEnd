@@ -1,0 +1,2 @@
+[14-Jan-2022 14:47:48 Asia/Jakarta] PHP Warning:  require(/home/wase9264/public_html/BigStars/public/../vendor/autoload.php): failed to open stream: No such file or directory in /home/wase9264/public_html/BigStars/public/index.php on line 24
+[14-Jan-2022 14:47:48 Asia/Jakarta] PHP Fatal error:  require(): Failed opening required '/home/wase9264/public_html/BigStars/public/../vendor/autoload.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/wase9264/public_html/BigStars/public/index.php on line 24
