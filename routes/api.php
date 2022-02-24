@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', 'API\AuthController@login');
 Route::post('/lupa-password', 'API\AuthController@forgotPassword');
 Route::post('/reset-password', 'API\AuthController@resetPassword');
+Route::post('/importGuru', 'API\GuruController@import');
+Route::post('/importSiswa', 'API\GuruController@import');
+Route::post('/importKelas', 'API\GuruController@import');
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
@@ -31,6 +34,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/create', 'API\GuruController@store');
         Route::get('/data', 'API\GuruController@index');
         Route::post('/update/{id}', 'API\GuruController@update');
+
         Route::get('/detail/{id}', 'API\GuruController@show');
         Route::get('/delete/{id}', 'API\GuruController@destroy');
     });
