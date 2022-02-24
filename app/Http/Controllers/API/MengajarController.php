@@ -209,7 +209,7 @@ class MengajarController extends Controller
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
                 ], 402);
-            }else{s
+            }else{
                 $idGuru = Guru::where('id_users', Auth::user()->id)->first();
 
                 $mengajar = [];
