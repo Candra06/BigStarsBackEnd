@@ -121,6 +121,8 @@ class MengajarController extends Controller
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+                return $tmpSpp;
+                return $tmpFee;
                 // cek apakah ada referal
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$result->spp;
@@ -326,7 +328,7 @@ class MengajarController extends Controller
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
-                ]);
+                ], 402);
             }
             $kelas = Kelas::where('id', $id)->first();
             $mengajar['id_guru'] = $kelas->id_guru;
