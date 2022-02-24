@@ -69,6 +69,17 @@ class MengajarController extends Controller
             'longitude' => 'required',
         ]);
         try {
+            $date = Carbon::now();
+            //Get date and time
+            $date->toDateTimeString();
+            $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
+            // cek apakah jam melebihi jam 9 malamm
+            if ($newDateTime >= strtotime("21:00")) {
+                return response()->json([
+                    'status_code' => 402,
+                    'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
+                ]);
+            }
             $mengajar = [];
             $fee = [];
             $spp = [];
@@ -186,6 +197,17 @@ class MengajarController extends Controller
             'longitude' => 'required',
         ]);
         try {
+            $date = Carbon::now();
+            //Get date and time
+            $date->toDateTimeString();
+            $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
+            // cek apakah jam melebihi jam 9 malamm
+            if ($newDateTime >= strtotime("21:00")) {
+                return response()->json([
+                    'status_code' => 402,
+                    'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
+                ]);
+            }
             $idGuru = Guru::where('id_users', Auth::user()->id)->first();
 
             $mengajar = [];
@@ -291,6 +313,17 @@ class MengajarController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $date = Carbon::now();
+            //Get date and time
+            $date->toDateTimeString();
+            $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
+            // cek apakah jam melebihi jam 9 malamm
+            if ($newDateTime >= strtotime("12:00")) {
+                return response()->json([
+                    'status_code' => 402,
+                    'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
+                ]);
+            }
             $kelas = Kelas::where('id', $id)->first();
             $mengajar['id_guru'] = $kelas->id_guru;
             $mengajar['id_kelas'] = $kelas->id;

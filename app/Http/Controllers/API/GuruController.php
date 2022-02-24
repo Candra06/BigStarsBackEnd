@@ -4,12 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Guru;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportGuru;
 use App\User;
 use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruController extends Controller
 {
@@ -41,9 +44,18 @@ class GuruController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function import()
     {
-        //
+        try {
+            Excel::import(new ImportGuru, request()->file('file'));
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

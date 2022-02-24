@@ -253,7 +253,6 @@ class KelasController extends Controller
                 'id_siswa' => $request->id_siswa,
                 'spp' => $request->spp,
                 'fee_guru' => $request->fee_guru,
-                'fee_guru' => $request->fee_guru,
                 'status' => 'Active',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
