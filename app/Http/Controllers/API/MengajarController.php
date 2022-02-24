@@ -117,7 +117,7 @@ class MengajarController extends Controller
 
 
                 $result = Mengajar::where('id', $id)->update($mengajar);
-
+                return $result;
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
