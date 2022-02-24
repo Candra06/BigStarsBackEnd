@@ -253,11 +253,11 @@ class MengajarController extends Controller
 
 
                 $result = Mengajar::create($mengajar);
-                return $result;
+                // return $result;
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
-                $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $idGuru->id)->first();
-                // return $tmpFee;
+                $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+                return $tmpFee;
                 // cek apakah ada referal
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$result->spp;
