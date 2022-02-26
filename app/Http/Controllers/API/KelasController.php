@@ -6,6 +6,7 @@ use App\DetailKelas;
 use App\Guru;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportKelas;
 use App\Kelas;
 use App\Mengajar;
 use App\Siswa;
@@ -14,6 +15,7 @@ use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KelasController extends Controller
 {
@@ -221,9 +223,18 @@ class KelasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function import()
     {
-        //
+        try {
+            Excel::import(new ImportKelas, request()->file('file'));
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**

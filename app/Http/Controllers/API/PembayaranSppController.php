@@ -23,16 +23,20 @@ class PembayaranSppController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function indexFinance($bulan)
+    public function indexFinance(Request $request)
     {
 
         try {
-            $spp = PembayaranSPP::whereMonth('tagihan_bulan',  Carbon::now()->format('m'))->where('status', 'Lunas')->get();
+            $spp = PembayaranSPP::whereMonth('tagihan_bulan', $request->bulan)
+                ->whereYear('tagihan_bulan', $request->tahun)
+                ->where('status', 'Lunas')->get();
             $totalSpp = 0;
             foreach ($spp as $key) {
                 $totalSpp += $key->jumlah;
             }
-            $fee = PembayaranFEE::whereMonth('tagihan_bulan', date('m', strtotime($bulan)))->where('status', 'Lunas')->get();
+            $fee = PembayaranFEE::whereMonth('tagihan_bulan', $request->bulan)
+                ->whereYear('tagihan_bulan', $request->tahun)
+                ->where('status', 'Lunas')->get();
             $totalFee = 0;
             // return $fee;
             foreach ($fee as $key) {

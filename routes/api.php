@@ -20,7 +20,7 @@ Route::post('/reset-password', 'API\AuthController@resetPassword');
 Route::post('/importGuru', 'API\GuruController@import');
 Route::post('/importSiswa', 'API\SiswaController@import');
 Route::post('/importSiswaByWali', 'API\SiswaController@importByWali');
-Route::post('/importKelas', 'API\GuruController@import');
+Route::post('/importKelas', 'API\KelasController@import');
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
@@ -82,7 +82,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/delete-wali/{id}', 'API\WalimuridController@destroy');
     });
     Route::prefix('finance')->group(function () {
-        Route::get('/index/{bulan}', 'API\PembayaranSppController@indexFinance');
+        Route::get('/index', 'API\PembayaranSppController@indexFinance');
         Route::get('/generate-fee', 'API\PembayaranFeeController@create');
         Route::get('/list-fee', 'API\PembayaranFeeController@index');
         Route::get('/generate-spp', 'API\PembayaranSppController@create');
