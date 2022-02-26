@@ -18,7 +18,8 @@ Route::post('/login', 'API\AuthController@login');
 Route::post('/lupa-password', 'API\AuthController@forgotPassword');
 Route::post('/reset-password', 'API\AuthController@resetPassword');
 Route::post('/importGuru', 'API\GuruController@import');
-Route::post('/importSiswa', 'API\GuruController@import');
+Route::post('/importSiswa', 'API\SiswaController@import');
+Route::post('/importSiswaByWali', 'API\SiswaController@importByWali');
 Route::post('/importKelas', 'API\GuruController@import');
 Route::middleware(['auth:sanctum'])->group(function () {
 

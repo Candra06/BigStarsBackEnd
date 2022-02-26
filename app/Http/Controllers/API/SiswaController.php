@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Imports\ImportSiswa;
+use App\Imports\ImportSiswaByWali;
 use App\Mengajar;
 use App\Referal;
 use App\Siswa;
@@ -10,6 +12,7 @@ use App\Walimurid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SiswaController extends Controller
 {
@@ -242,6 +245,34 @@ class SiswaController extends Controller
                 'message' => 'Failed delete data',
                 'error' => $th
             ]);
+        }
+    }
+
+    public function import()
+    {
+        try {
+            Excel::import(new ImportSiswa, request()->file('file'));
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function importByWali()
+    {
+        try {
+            Excel::import(new ImportSiswaByWali, request()->file('file'));
+
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 }
