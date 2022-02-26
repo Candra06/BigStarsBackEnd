@@ -175,6 +175,12 @@ class KelasController extends Controller
             }
             $result = $dt->get();
             // return $result;
+            $coba = [];
+            foreach ($result as $key) {
+                $detail = DetailKelas::where('id_kelas', $key->id)->first();
+                array_push($coba, $detail);
+            }
+            return $coba;
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
