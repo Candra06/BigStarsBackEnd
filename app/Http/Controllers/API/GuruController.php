@@ -24,7 +24,7 @@ class GuruController extends Controller
     public function index()
     {
         try {
-            $data = Guru::leftJoin('users', 'users.id', 'guru.id_users')->select('users.username', 'users.phone', 'guru.*')->get();
+            $data = Guru::leftJoin('users', 'users.id', 'guru.id_users')->select('users.username', 'users.phone', 'guru.*')->where('guru.status', '!=', 'Deleted')->get();
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
