@@ -174,7 +174,7 @@ class KelasController extends Controller
                 $dt = $dt->where('kelas.status', $request->status);
             }
             $result = $dt->get();
-            return $result;
+            // return $result;
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
@@ -182,7 +182,7 @@ class KelasController extends Controller
                 $mengajar = Mengajar::where('id_kelas', $key->id)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->count();
-                // return $jumlahHari;
+                return $detail;
                 foreach ($jumlahHari as $jh) {
                     $jumlah += (int)$this->getWeeklyDayNumbers($start, $end, $jh->hari);
                 }
