@@ -29,13 +29,12 @@ class ImportKelas implements ToCollection
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
-            for ($i = 0; $i < count($hari) -1; $i++) {
-                DetailKelas::create([
-                    'id_kelas' => $kelas->id,
-                    'hari' => $hari[$i],
-                    'jam_mulai' => $jamMulai[$i],
-                    'jam_selesai' => $jamSelesai[$i],
-                ]);
+            for ($i = 0; $i < count($hari); $i++) {
+                $detail['id_kelas'] = $kelas->id;
+                $detail['hari'] = $hari[$i];
+                $detail['jam_mulai'] = $jamMulai[$i];
+                $detail['jam_selesai'] =$jamSelesai[$i];
+                DetailKelas::create($detail);
             }
         }
     }
