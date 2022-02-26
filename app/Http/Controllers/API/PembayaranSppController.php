@@ -27,16 +27,22 @@ class PembayaranSppController extends Controller
     {
 
         try {
-            $spp = PembayaranSPP::whereMonth('tagihan_bulan', $request->bulan)
-                ->whereYear('tagihan_bulan', $request->tahun)
-                ->where('status', 'Lunas')->get();
+            $querySpp = PembayaranSPP::where('status', 'Lunas');
+            $queryFee = PembayaranFEE::where('status', 'Lunas');
+            if ($request->bulan) {
+                $querySpp = $querySpp->whereMonth('tagihan_bulan', $request->bulan);
+                $queryFee = $queryFee->whereMonth('tagihan_bulan', $request->bulan);
+            }
+            if ($request->tahun) {
+                $querySpp = $querySpp->whereYear('tagihan_bulan', $request->tahun);
+                $queryFee = $queryFee->whereYear('tagihan_bulan', $request->tahun);
+            }
+            $spp = $querySpp->get();
             $totalSpp = 0;
             foreach ($spp as $key) {
                 $totalSpp += $key->jumlah;
             }
-            $fee = PembayaranFEE::whereMonth('tagihan_bulan', $request->bulan)
-                ->whereYear('tagihan_bulan', $request->tahun)
-                ->where('status', 'Lunas')->get();
+            $fee = $queryFee->get();
             $totalFee = 0;
             // return $fee;
             foreach ($fee as $key) {
