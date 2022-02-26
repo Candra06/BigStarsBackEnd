@@ -174,7 +174,7 @@ class KelasController extends Controller
                 $dt = $dt->where('kelas.status', $request->status);
             }
             $result = $dt->get();
-            // return $result;
+            return $result;
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
