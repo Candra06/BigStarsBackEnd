@@ -182,7 +182,7 @@ class KelasController extends Controller
                 $mengajar = Mengajar::where('id_kelas', $key->id)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->count();
-                return $detail;
+                // return $detail;
                 foreach ($jumlahHari as $jh) {
                     $jumlah += (int)$this->getWeeklyDayNumbers($start, $end, $jh->hari);
                 }
