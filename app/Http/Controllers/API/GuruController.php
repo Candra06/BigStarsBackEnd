@@ -183,8 +183,8 @@ class GuruController extends Controller
             $data = Guru::where('id', $id)->first();
             // return $data;
             $id_user = $data->id_users;
-            Guru::where('id', $id)->delete();
-            User::where('id', $id_user)->delete();
+            Guru::where('id', $id)->update(['status'=>'Deleted']);
+            // User::where('id', $id_user)->update(['status'=>'Deleted']);
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
