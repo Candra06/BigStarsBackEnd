@@ -42,8 +42,8 @@ class MengajarController extends Controller
             $mengajar['file_materi'] = '-';
             $mengajar['materi'] = '-';
             $mengajar['jurnal'] = '-';
-            $mengajar['latitude'] = $request->latitude;
-            $mengajar['longitude'] = $request->longitude;
+            $mengajar['latitude'] = '-8.2074597';
+            $mengajar['longitude'] = '113.697264';
             $mengajar['created_at'] = Carbon::now();
             $mengajar['updated_at'] = Carbon::now();
             Mengajar::create($mengajar);
@@ -122,22 +122,70 @@ class MengajarController extends Controller
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+                // return $tmpSpp;
+                //cek ada atau belum tagihan spp pada bulan x dan id siswa x
+                if ($tmpSpp) { //jika ada
+                    // return 'sini';
+                    $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                    $jumlahSpp =  (int)$result->spp;
+                    // percabangan ketika ada data atau tidak
+                    if ($reff > 0) {
+                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                    } else {
+                        $jumlahSpp = (int)$result->spp;
+                    }
+                    // menghitung jumlah tagihan
+                    $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                } else { //jika tidak ada maka buat tagihan baru
+                    $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                    $jumlahSpp =  (int)$result->spp;
+                    // percabangan ketika ada data atau tidak
+                    if ($reff > 0) {
+                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
+                    } else {
+                        $jumlahSpp = (int)$result->spp;
+                        $absen['keterangan'] = '-';
+                    }
+                    $absen['jumlah'] = $jumlahSpp;
+
+
+                    $now = Carbon::now();
+                    $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa->id_siswa;
+                    $absen['id_siswa'] = $idSiswa->id_siswa;
+                    $absen['tagihan_bulan'] = Carbon::now()->format('Y-m-d');
+                    $absen['status'] = 'Belum Lunas';
+                    $absen['created_by'] = Auth::user()->id;
+                    $absen['updated_by'] = Auth::user()->id;
+                    $absen['created_at'] = $now;
+                    $absen['updated_at'] = $now;
+                    PembayaranSPP::create($absen);
+                    // return 'here';
+                }
+                //cek ada atau belum tagihan fee pada bulan x dan id guru x
+                if ($tmpFee) { // jika ada
+                    $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+
+                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+                } else {
+                    $now = Carbon::now();
+                    $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
+                    $absen['id_guru'] = $result->id_guru;
+                    $absen['jumlah'] = (int)$result->fee_pengajar;
+                    $absen['tagihan_bulan'] = $now->format('Y-m-d');
+                    $absen['status'] = 'Belum Lunas';
+                    $absen['created_by'] = Auth::user()->id;
+                    $absen['updated_by'] = Auth::user()->id;
+                    $absen['created_at'] = $now;
+                    $absen['updated_at'] = $now;
+                    PembayaranFEE::create($absen);
+                }
 
                 // return $tmpFee;
                 // cek apakah ada referal
-                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-                $jumlahSpp =  (int)$result->spp;
-                // percabangan ketika ada data atau tidak
-                if ($reff > 0) {
-                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
-                } else {
-                    $jumlahSpp = (int)$result->spp;
-                }
-                // menghitung jumlah tagihan
-                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+
+
 
                 return response()->json([
                     'status_code' => 200,
@@ -212,7 +260,7 @@ class MengajarController extends Controller
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
                 ], 402);
-            }else{
+            } else {
                 $idGuru = Guru::where('id_users', Auth::user()->id)->first();
 
                 $mengajar = [];
@@ -258,27 +306,73 @@ class MengajarController extends Controller
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
                 // return $tmpFee;
-                // cek apakah ada referal
-                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-                $jumlahSpp =  (int)$result->spp;
-                // percabangan ketika ada data atau tidak
-                if ($reff > 0) {
-                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+
+                // cek apakah tagihan spp sudah ada?
+                if ($tmpSpp) {
+                    // cek apakah ada referal
+                    $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                    $jumlahSpp =  (int)$result->spp;
+                    // percabangan ketika ada data atau tidak
+                    if ($reff > 0) {
+                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                    } else {
+                        $jumlahSpp = (int)$result->spp;
+                    }
+                    // menghitung jumlah tagihan
+                    $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
                 } else {
-                    $jumlahSpp = (int)$result->spp;
+                    $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                    $jumlahSpp =  (int)$result->spp;
+                    // percabangan ketika ada data atau tidak
+                    if ($reff > 0) {
+                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
+                    } else {
+                        $jumlahSpp = (int)$result->spp;
+                        $absen['keterangan'] = '-';
+                    }
+                    $absen['jumlah'] = $jumlahSpp;
+
+
+                    $now = Carbon::now();
+                    $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa->id_siswa;
+                    $absen['id_siswa'] = $idSiswa->id_siswa;
+                    $absen['tagihan_bulan'] = Carbon::now()->format('Y-m-d');
+                    $absen['status'] = 'Belum Lunas';
+                    $absen['created_by'] = Auth::user()->id;
+                    $absen['updated_by'] = Auth::user()->id;
+                    $absen['created_at'] = $now;
+                    $absen['updated_at'] = $now;
+                    PembayaranSPP::create($absen);
                 }
-                // menghitung jumlah tagihan
-                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
-                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+                if ($tmpFee) {
+                    $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+
+                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+                } else {
+                    $now = Carbon::now();
+                    $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
+                    $absen['id_guru'] = $result->id_guru;
+                    $absen['jumlah'] = (int)$result->fee_pengajar;
+                    $absen['tagihan_bulan'] = $now->format('Y-m-d');
+                    $absen['status'] = 'Belum Lunas';
+                    $absen['created_by'] = Auth::user()->id;
+                    $absen['updated_by'] = Auth::user()->id;
+                    $absen['created_at'] = $now;
+                    $absen['updated_at'] = $now;
+                    PembayaranFEE::create($absen);
+                }
+
+
+
+
 
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success'
                 ]);
             }
-
         } catch (\Throwable $th) {
             return $th;
             return response()->json([
@@ -354,22 +448,62 @@ class MengajarController extends Controller
             $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
             $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
 
-            // cek apakah ada referal
-            $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-            $jumlahSpp =  (int)$result->spp;
-            // percabangan ketika ada data atau tidak
-            if ($reff > 0) {
-                $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+            // cek apakah tagihan spp sudah ada?
+            if ($tmpSpp) {
+                // cek apakah ada referal
+                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                $jumlahSpp =  (int)$result->spp;
+                // percabangan ketika ada data atau tidak
+                if ($reff > 0) {
+                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                } else {
+                    $jumlahSpp = (int)$result->spp;
+                }
+                // menghitung jumlah tagihan
+                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
             } else {
-                $jumlahSpp = (int)$result->spp;
-            }
-            // menghitung jumlah tagihan
-            $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-            $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+                $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
+                $jumlahSpp =  (int)$result->spp;
+                // percabangan ketika ada data atau tidak
+                if ($reff > 0) {
+                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                    $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
+                } else {
+                    $jumlahSpp = (int)$result->spp;
+                    $absen['keterangan'] = '-';
+                }
+                $absen['jumlah'] = $jumlahSpp;
 
-            // update jumlah tagihan
-            PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
-            PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+
+                $now = Carbon::now();
+                $absen['no_invoice'] = '#SPP' . $now->year . '' . $now->month . '' . $idSiswa->id_siswa;
+                $absen['id_siswa'] = $idSiswa->id_siswa;
+                $absen['tagihan_bulan'] = Carbon::now()->format('Y-m-d');
+                $absen['status'] = 'Belum Lunas';
+                $absen['created_by'] = Auth::user()->id;
+                $absen['updated_by'] = Auth::user()->id;
+                $absen['created_at'] = $now;
+                $absen['updated_at'] = $now;
+                PembayaranSPP::create($absen);
+            }
+            if ($tmpFee) {
+                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+
+                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+            } else {
+                $now = Carbon::now();
+                $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
+                $absen['id_guru'] = $result->id_guru;
+                $absen['jumlah'] = (int)$result->fee_pengajar;
+                $absen['tagihan_bulan'] = $now->format('Y-m-d');
+                $absen['status'] = 'Belum Lunas';
+                $absen['created_by'] = Auth::user()->id;
+                $absen['updated_by'] = Auth::user()->id;
+                $absen['created_at'] = $now;
+                $absen['updated_at'] = $now;
+                PembayaranFEE::create($absen);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success'
