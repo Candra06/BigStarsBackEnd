@@ -434,8 +434,8 @@ class MengajarController extends Controller
             $mengajar['jurnal'] = $request->jurnal;
             $mengajar['latitude'] = '-8.2074597';
             $mengajar['longitude'] = '113.697264';
-            $mengajar['created_at'] = $request->tglKelas;
-            $mengajar['updated_at'] = $request->tglKelas;
+            $mengajar['created_at'] = date('Y-m-d H:i:s',strtotime($request->tglKelas));
+            $mengajar['updated_at'] = date('Y-m-d H:i:s',strtotime($request->tglKelas));
             $result = Mengajar::create($mengajar);
             // select data siswa berdasarkan kelas
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
