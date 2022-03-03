@@ -116,6 +116,7 @@ class NotifCron extends Command
                 }
             }
         }
+        $this->info('Cron success');
         return 0;
     }
 }
