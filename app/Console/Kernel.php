@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('demo:cron')
             ->monthlyOn(1, '00:02');
         $schedule->command('notif:cron')
-            ->daily();
+            ->everyMinute();
     }
 
     /**
