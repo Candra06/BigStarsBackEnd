@@ -410,10 +410,8 @@ class MengajarController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $date = Carbon::now();
-            //Get date and time
-            $date->toDateTimeString();
-            $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
+            $created = date('H:i:s'). $request->tglKelas;
+
             // cek apakah jam melebihi jam 9 malamm
             // if (strtotime($newDateTime) >= strtotime("21:10")) {
             //     return response()->json([
@@ -434,8 +432,8 @@ class MengajarController extends Controller
             $mengajar['jurnal'] = $request->jurnal;
             $mengajar['latitude'] = '-8.2074597';
             $mengajar['longitude'] = '113.697264';
-            $mengajar['created_at'] = date('Y-m-d H:i:s',strtotime($request->tglKelas));
-            $mengajar['updated_at'] = date('Y-m-d H:i:s',strtotime($request->tglKelas));
+            $mengajar['created_at'] = date('Y-m-d', strtotime($created));
+            $mengajar['updated_at'] = date('Y-m-d', strtotime($created)) ;
             $result = Mengajar::create($mengajar);
             // select data siswa berdasarkan kelas
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
