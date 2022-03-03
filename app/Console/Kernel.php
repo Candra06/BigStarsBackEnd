@@ -27,7 +27,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('demo:cron')
-            ->monthlyOn(17, '13:12');
+            ->monthlyOn(1, '00:02');
+        $schedule->command('notif:cron')
+            ->daily();
     }
 
     /**
