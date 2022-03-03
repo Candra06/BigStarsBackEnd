@@ -410,7 +410,7 @@ class MengajarController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $created = date('H:i:s'). $request->tglKelas;
+            $created = $request->tglKelas.' '.date('H:i:s');
 
             // cek apakah jam melebihi jam 9 malamm
             // if (strtotime($newDateTime) >= strtotime("21:10")) {
@@ -432,8 +432,8 @@ class MengajarController extends Controller
             $mengajar['jurnal'] = $request->jurnal;
             $mengajar['latitude'] = '-8.2074597';
             $mengajar['longitude'] = '113.697264';
-            $mengajar['created_at'] = date('Y-m-d', strtotime($created));
-            $mengajar['updated_at'] = date('Y-m-d', strtotime($created)) ;
+            $mengajar['created_at'] = date('Y-m-d H:i:s', strtotime($created));
+            $mengajar['updated_at'] = date('Y-m-d H:i:s', strtotime($created)) ;
             $result = Mengajar::create($mengajar);
             // select data siswa berdasarkan kelas
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
