@@ -364,10 +364,6 @@ class MengajarController extends Controller
                     PembayaranFEE::create($absen);
                 }
 
-
-
-
-
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success'
@@ -419,12 +415,12 @@ class MengajarController extends Controller
             $date->toDateTimeString();
             $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
             // cek apakah jam melebihi jam 9 malamm
-            if (strtotime($newDateTime) >= strtotime("21:10")) {
-                return response()->json([
-                    'status_code' => 402,
-                    'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
-                ], 402);
-            }
+            // if (strtotime($newDateTime) >= strtotime("21:10")) {
+            //     return response()->json([
+            //         'status_code' => 402,
+            //         'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
+            //     ], 402);
+            // }
             $kelas = Kelas::where('id', $id)->first();
             $mengajar['id_guru'] = $kelas->id_guru;
             $mengajar['id_kelas'] = $kelas->id;
