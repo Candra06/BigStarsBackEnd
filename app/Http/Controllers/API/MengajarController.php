@@ -255,7 +255,7 @@ class MengajarController extends Controller
             $newDateTime = date('G:i', strtotime($date->toDateTimeString()));
             // cek apakah jam melebihi jam 9 malamm
             // return strtotime("13:00");
-            if (strtotime($newDateTime) >= strtotime("21:00")) {
+            if (strtotime($newDateTime) >= strtotime("23:00")) {
                 return response()->json([
                     'status_code' => 402,
                     'message' => 'Waktu absensi sudah ditutup, silahkan menghubungi admin',
