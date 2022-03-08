@@ -136,7 +136,7 @@ class MengajarController extends Controller
                     }
                     // menghitung jumlah tagihan
                     $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
                 } else { //jika tidak ada maka buat tagihan baru
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
@@ -320,7 +320,7 @@ class MengajarController extends Controller
                     }
                     // menghitung jumlah tagihan
                     $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
                 } else {
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
@@ -410,7 +410,7 @@ class MengajarController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $created = $request->tglKelas.' '.date('H:i:s');
+            $created = $request->tglKelas . ' ' . date('H:i:s');
 
             // cek apakah jam melebihi jam 9 malamm
             // if (strtotime($newDateTime) >= strtotime("21:10")) {
@@ -433,7 +433,7 @@ class MengajarController extends Controller
             $mengajar['latitude'] = '-8.2074597';
             $mengajar['longitude'] = '113.697264';
             $mengajar['created_at'] = date('Y-m-d H:i:s', strtotime($created));
-            $mengajar['updated_at'] = date('Y-m-d H:i:s', strtotime($created)) ;
+            $mengajar['updated_at'] = date('Y-m-d H:i:s', strtotime($created));
             $result = Mengajar::create($mengajar);
             // select data siswa berdasarkan kelas
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
@@ -455,7 +455,7 @@ class MengajarController extends Controller
                 }
                 // menghitung jumlah tagihan
                 $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
+                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
             } else {
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$result->spp;
