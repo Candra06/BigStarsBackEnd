@@ -244,7 +244,7 @@ class MengajarController extends Controller
             'materi' => 'required',
             'jurnal' => 'required',
             'status' => 'required',
-            'poin' => 'required',
+            // 'poin' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
         ]);
