@@ -304,6 +304,7 @@ class PembayaranFeeController extends Controller
                 ->select('guru.nama', 'pembayaran_fee.*')->where('pembayaran_fee.id', $id)->first();
             $total = Mengajar::where('id_guru', $detail->id_guru)->count();
 
+            $data['id'] = $detail->id;
             $data['no_invoice'] = $detail->no_invoice;
             $data['nama'] = $detail->nama;
             $data['fee_bulan'] = $detail->tagihan_bulan;
