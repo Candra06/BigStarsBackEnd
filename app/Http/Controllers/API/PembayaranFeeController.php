@@ -307,7 +307,7 @@ class PembayaranFeeController extends Controller
             $data['id'] = $detail->id;
             $data['no_invoice'] = $detail->no_invoice;
             $data['nama'] = $detail->nama;
-            $data['fee_bulan'] = $detail->tagihan_bulan;
+            $data['tagihan_bulan'] = $detail->tagihan_bulan;
             $data['jumlah'] = $detail->jumlah;
             $data['status'] = $detail->status;
             $data['total_pertemuan'] = $total;
