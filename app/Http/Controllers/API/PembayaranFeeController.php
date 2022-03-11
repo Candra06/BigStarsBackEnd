@@ -153,11 +153,11 @@ class PembayaranFeeController extends Controller
             //         PembayaranFEE::create($absen);
             //     }
 
-                return response()->json([
-                    'status_code' => 200,
-                    'message' => 'Success',
-                    'data' => $absen
-                ]);
+            return response()->json([
+                'status_code' => 200,
+                'message' => 'Success',
+                'data' => $absen
+            ]);
             // }
         } catch (\Throwable $th) {
             return $th;
@@ -304,6 +304,27 @@ class PembayaranFeeController extends Controller
                 ->select('guru.nama', 'pembayaran_fee.*')->where('pembayaran_fee.id', $id)->first();
             $total = Mengajar::where('id_guru', $detail->id_guru)->count();
 
+            $month = explode('-', $detail->tagihan_bulan);
+            $bulan = intval($month[1]);
+            $year = intval($month[0]);
+            $b = $bulan == 0 ? 12 : $bulan;
+            $y = $b == 12 ? $year : $month[0];
+
+            if ($b  < 10) {
+                $b = '0' . $b;
+            } else {
+                $b = $b;
+            }
+
+            $list = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
+                ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
+                ->select('mengajar.*', 'mapel.mapel', 'siswa.nama')
+                ->where('mengajar.id_guru', $detail->id_guru)
+                ->whereMonth('mengajar.created_at', $b)
+                ->whereYear('mengajar.created_at', $y)
+                ->get();
+
             $data['id'] = $detail->id;
             $data['no_invoice'] = $detail->no_invoice;
             $data['nama'] = $detail->nama;
@@ -313,6 +334,7 @@ class PembayaranFeeController extends Controller
             $data['total_pertemuan'] = $total;
             $data['created_at'] = $detail->created_at;
             $data['udpated_at'] = $detail->udpated_at;
+            $data['history_kehadiran'] = $list;
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
