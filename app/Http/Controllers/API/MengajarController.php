@@ -124,10 +124,10 @@ class MengajarController extends Controller
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
                 // return $tmpSpp;
                 //cek ada atau belum tagihan spp pada bulan x dan id siswa x
-                $totalSPP = Mengajar::where('id', $result->id_kelas)
+                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->sum('spp');
-                $totalFee = Mengajar::where('id', $result->id_kelas)
+                $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->sum('fee_pengajar');
                 return $totalSPP . ' '. $totalFee;
@@ -315,10 +315,10 @@ class MengajarController extends Controller
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
                 // return $tmpFee;
-                $totalSPP = Mengajar::where('id', $result->id_kelas)
+                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->sum('spp');
-                $totalFee = Mengajar::where('id', $result->id_kelas)
+                $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->sum('fee_pengajar');
                 return $totalFee . ' ' . $totalSPP;
