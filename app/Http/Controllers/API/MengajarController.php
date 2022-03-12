@@ -124,19 +124,28 @@ class MengajarController extends Controller
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
                 // return $tmpSpp;
                 //cek ada atau belum tagihan spp pada bulan x dan id siswa x
+                $totalSPP = Mengajar::where('id', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->sum('spp');
+                $totalFee = Mengajar::where('id', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->sum('spp');
+                return $totalSPP . ' '. $totalFee;
                 if ($tmpSpp) { //jika ada
                     // return 'sini';
+                    $keterangan = '';
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
                         $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$result->spp;
                     }
                     // menghitung jumlah tagihan
                     $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => $keterangan]);
                 } else { //jika tidak ada maka buat tagihan baru
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
@@ -306,21 +315,30 @@ class MengajarController extends Controller
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
                 // return $tmpFee;
-
+                $totalSPP = Mengajar::where('id', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->sum('spp');
+                $totalFee = Mengajar::where('id', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->sum('spp');
+                return $totalFee . ' ' . $totalSPP;
                 // cek apakah tagihan spp sudah ada?
                 if ($tmpSpp) {
                     // cek apakah ada referal
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
+
+                    $keterangan = '';
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
                         $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$result->spp;
                     }
                     // menghitung jumlah tagihan
                     $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
+                    PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => $keterangan]);
                 } else {
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$result->spp;
