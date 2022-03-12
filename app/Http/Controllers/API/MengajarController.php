@@ -128,11 +128,7 @@ class MengajarController extends Controller
                     ->whereMonth('created_at', Carbon::now()->format('m'))
                     ->whereYear('created_at', Carbon::now()->format('Y'))
                     ->sum('spp');
-                $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
-                    ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->whereYear('created_at', Carbon::now()->format('Y'))
-                    ->sum('fee_pengajar');
-                return $totalSPP . ' ' . $totalFee;
+
                 if ($tmpSpp) { //jika ada
                     // return 'sini';
                     $keterangan = '';
@@ -176,9 +172,12 @@ class MengajarController extends Controller
                 }
                 //cek ada atau belum tagihan fee pada bulan x dan id guru x
                 if ($tmpFee) { // jika ada
-                    $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+                    $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
+                        ->whereMonth('created_at', Carbon::now()->format('m'))
+                        ->whereYear('created_at', Carbon::now()->format('Y'))
+                        ->sum('fee_pengajar');
 
-                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $totalFee]);
                 } else {
                     $now = Carbon::now();
                     $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
@@ -316,19 +315,15 @@ class MengajarController extends Controller
                 $idSiswa = Kelas::where('id', $result->id_kelas)->first();
                 $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
                 $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
-                // return $tmpFee;
-                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
-                    ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->whereYear('created_at', Carbon::now()->format('Y'))
-                    ->sum('spp');
-                $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
-                    ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->whereYear('created_at', Carbon::now()->format('Y'))
-                    ->sum('fee_pengajar');
-                return $totalSPP . ' ' . $totalFee;
+
                 // cek apakah tagihan spp sudah ada?
                 if ($tmpSpp) {
                     // cek apakah ada referal
+                    // return $tmpFee;
+                    $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
+                        ->whereMonth('created_at', Carbon::now()->format('m'))
+                        ->whereYear('created_at', Carbon::now()->format('Y'))
+                        ->sum('spp');
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$totalSPP;
 
@@ -368,10 +363,15 @@ class MengajarController extends Controller
                     $absen['updated_at'] = $now;
                     PembayaranSPP::create($absen);
                 }
-                if ($tmpFee) {
-                    $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
 
-                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+
+                if ($tmpFee) {
+                    $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
+                        ->whereMonth('created_at', Carbon::now()->format('m'))
+                        ->whereYear('created_at', Carbon::now()->format('Y'))
+                        ->sum('fee_pengajar');
+
+                    PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $totalFee]);
                 } else {
                     $now = Carbon::now();
                     $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
@@ -464,29 +464,28 @@ class MengajarController extends Controller
             $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
             $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
 
-            $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
-                ->whereMonth('created_at', Carbon::now()->format('m'))
-                ->whereYear('created_at', Carbon::now()->format('Y'))
-                ->sum('spp');
-            $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
-                ->whereMonth('created_at', Carbon::now()->format('m'))
-                ->whereYear('created_at', Carbon::now()->format('Y'))
-                ->sum('fee_pengajar');
-            return $totalSPP . ' ' . $totalFee;
+
+
             // cek apakah tagihan spp sudah ada?
             if ($tmpSpp) {
+                $keterangan = '';
+                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->whereYear('created_at', Carbon::now()->format('Y'))
+                    ->sum('spp');
                 // cek apakah ada referal
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-                $jumlahSpp =  (int)$result->spp;
+                $jumlahSpp =  (int)$totalSPP;
                 // percabangan ketika ada data atau tidak
                 if ($reff > 0) {
-                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                    $jumlahSpp = (int)$totalSPP * ($reff * 10) / 100;
+                    $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                 } else {
-                    $jumlahSpp = (int)$result->spp;
+                    $jumlahSpp = (int)$totalSPP;
                 }
                 // menghitung jumlah tagihan
-                $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
-                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman']);
+                $upSpp = (int)$jumlahSpp;
+                PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => $keterangan]);
             } else {
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$result->spp;
@@ -513,9 +512,12 @@ class MengajarController extends Controller
                 PembayaranSPP::create($absen);
             }
             if ($tmpFee) {
-                $upFee = (int)$tmpFee->jumlah + (int)$result->fee_pengajar;
+                $totalFee = Mengajar::where('id_kelas', $result->id_kelas)
+                    ->whereMonth('created_at', Carbon::now()->format('m'))
+                    ->whereYear('created_at', Carbon::now()->format('Y'))
+                    ->sum('fee_pengajar');
 
-                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $upFee]);
+                PembayaranFEE::where('id', $tmpFee->id)->update(['jumlah' => $totalFee]);
             } else {
                 $now = Carbon::now();
                 $absen['no_invoice'] = '#FEE' . $now->year . '' . $now->month . '' . $result->id_guru;
