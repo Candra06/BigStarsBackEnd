@@ -27,7 +27,7 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        
+
         try {
 
             $request->validate([
@@ -220,7 +220,7 @@ class AuthController extends Controller
                 ->leftJoin('mapel', 'mapel.id', 'kelas.id_mapel')
                 ->whereDate('mengajar.created_at', date('Y-m-d'))
                 ->where('mengajar.tipe', 'Pengganti')
-                ->where('mengajar.status', 'Waiting')
+                // ->where('mengajar.status', 'Waiting')
                 ->where('detail_kelas.hari', Helper::getDay($mytime->format('l')))
                 ->select('siswa.nama as siswa', 'guru.nama as guru', 'mapel.mapel', 'kelas.id as id_kelas', 'kelas.status', 'detail_kelas.jam_mulai', 'detail_kelas.jam_selesai')
                 ->get();
