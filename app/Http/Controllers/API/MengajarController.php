@@ -129,7 +129,7 @@ class MengajarController extends Controller
                     ->sum('spp');
                 $totalFee = Mengajar::where('id', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->sum('fee_guru');
+                    ->sum('fee_pengajar');
                 return $totalSPP . ' '. $totalFee;
                 if ($tmpSpp) { //jika ada
                     // return 'sini';
@@ -320,7 +320,7 @@ class MengajarController extends Controller
                     ->sum('spp');
                 $totalFee = Mengajar::where('id', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->sum('fee_guru');
+                    ->sum('fee_pengajar');
                 return $totalFee . ' ' . $totalSPP;
                 // cek apakah tagihan spp sudah ada?
                 if ($tmpSpp) {
