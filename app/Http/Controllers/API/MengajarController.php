@@ -129,22 +129,22 @@ class MengajarController extends Controller
                     ->sum('spp');
                 $totalFee = Mengajar::where('id', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->sum('spp');
+                    ->sum('fee_guru');
                 return $totalSPP . ' '. $totalFee;
                 if ($tmpSpp) { //jika ada
                     // return 'sini';
                     $keterangan = '';
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-                    $jumlahSpp =  (int)$result->spp;
+                    $jumlahSpp =  (int)$totalSPP;
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
-                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $jumlahSpp = (int)$totalSPP * ($reff * 10) / 100;
                         $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
-                        $jumlahSpp = (int)$result->spp;
+                        $jumlahSpp = (int)$totalSPP;
                     }
                     // menghitung jumlah tagihan
-                    $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                    $upSpp = $jumlahSpp;
                     PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => $keterangan]);
                 } else { //jika tidak ada maka buat tagihan baru
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
@@ -320,13 +320,13 @@ class MengajarController extends Controller
                     ->sum('spp');
                 $totalFee = Mengajar::where('id', $result->id_kelas)
                     ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->sum('spp');
+                    ->sum('fee_guru');
                 return $totalFee . ' ' . $totalSPP;
                 // cek apakah tagihan spp sudah ada?
                 if ($tmpSpp) {
                     // cek apakah ada referal
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
-                    $jumlahSpp =  (int)$result->spp;
+                    $jumlahSpp =  (int)$totalSPP;
 
                     $keterangan = '';
                     // percabangan ketika ada data atau tidak
