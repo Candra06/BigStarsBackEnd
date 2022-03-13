@@ -136,7 +136,8 @@ class MengajarController extends Controller
                     $jumlahSpp =  (int)$totalSPP;
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
-                        $jumlahSpp = (int)$totalSPP * ($reff * 10) / 100;
+                        $diskon = (int)$totalSPP * ($reff * 10) / 100;
+                        $jumlahSpp = $jumlahSpp - (int)$diskon;
                         $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$totalSPP;
@@ -149,7 +150,8 @@ class MengajarController extends Controller
                     $jumlahSpp =  (int)$result->spp;
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
-                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $diskon = (int)$result->spp * ($reff * 10) / 100;
+                        $jumlahSpp = (int)$result->spp - (int)$diskon;
                         $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$result->spp;
@@ -330,7 +332,8 @@ class MengajarController extends Controller
                     $keterangan = '';
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
-                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $diskon = (int)$totalSPP * ($reff * 10) / 100;
+                        $jumlahSpp = $jumlahSpp - (int)$diskon;
                         $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$result->spp;
@@ -343,7 +346,8 @@ class MengajarController extends Controller
                     $jumlahSpp =  (int)$result->spp;
                     // percabangan ketika ada data atau tidak
                     if ($reff > 0) {
-                        $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                        $diskon = (int)$result->spp * ($reff * 10) / 100;
+                        $jumlahSpp = (int)$result->spp - (int)$diskon;
                         $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
                         $jumlahSpp = (int)$result->spp;
@@ -478,7 +482,8 @@ class MengajarController extends Controller
                 $jumlahSpp =  (int)$totalSPP;
                 // percabangan ketika ada data atau tidak
                 if ($reff > 0) {
-                    $jumlahSpp = (int)$totalSPP * ($reff * 10) / 100;
+                    $diskon = (int)$totalSPP * ($reff * 10) / 100;
+                    $jumlahSpp = $jumlahSpp - (int)$diskon;
                     $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                 } else {
                     $jumlahSpp = (int)$totalSPP;
@@ -491,7 +496,8 @@ class MengajarController extends Controller
                 $jumlahSpp =  (int)$result->spp;
                 // percabangan ketika ada data atau tidak
                 if ($reff > 0) {
-                    $jumlahSpp = (int)$result->spp * ($reff * 10) / 100;
+                    $diskon = (int)$result->spp * ($reff * 10) / 100;
+                    $jumlahSpp = (int)$result->spp - (int)$diskon;
                     $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                 } else {
                     $jumlahSpp = (int)$result->spp;
