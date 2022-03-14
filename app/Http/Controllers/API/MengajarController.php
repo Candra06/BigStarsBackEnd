@@ -128,10 +128,12 @@ class MengajarController extends Controller
                     ->where('id_guru', $result->id_guru)->first();
                 // return $tmpSpp;
                 //cek ada atau belum tagihan spp pada bulan x dan id siswa x
-                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
-                    ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->whereYear('created_at', Carbon::now()->format('Y'))
-                    ->sum('spp');
+                $totalSPP = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+
+                    ->where('kelas.id_siswa', $idSiswa->id_siswa)
+                    ->whereMonth('mengajar.created_at', Carbon::now()->format('m'))
+                    ->whereYear('mengajar.created_at', Carbon::now()->format('Y'))
+                    ->sum('mengajar.spp');
 
                 if ($tmpSpp) { //jika ada
                     // return 'sini';
@@ -158,7 +160,7 @@ class MengajarController extends Controller
                         $jumlahSpp = (int)$result->spp - (int)$diskon;
                         $absen['keterangan'] = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
-                        $jumlahSpp = (int)$result->spp;
+                        $jumlahSpp = $jumlahSpp;
                         $absen['keterangan'] = '-';
                     }
                     $absen['jumlah'] = $jumlahSpp;
@@ -330,10 +332,11 @@ class MengajarController extends Controller
                 if ($tmpSpp) {
                     // cek apakah ada referal
                     // return $tmpFee;
-                    $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
-                        ->whereMonth('created_at', Carbon::now()->format('m'))
-                        ->whereYear('created_at', Carbon::now()->format('Y'))
-                        ->sum('spp');
+                    $totalSPP = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                        ->where('kelas.id_siswa', $idSiswa->id_siswa)
+                        ->whereMonth('mengajar.created_at', Carbon::now()->format('m'))
+                        ->whereYear('mengajar.created_at', Carbon::now()->format('Y'))
+                        ->sum('mengajar.spp');
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                     $jumlahSpp =  (int)$totalSPP;
 
@@ -344,7 +347,7 @@ class MengajarController extends Controller
                         $jumlahSpp = $jumlahSpp - (int)$diskon;
                         $keterangan = 'Potongan ' . $reff . '0% dari mengundang ' . $reff . ' teman';
                     } else {
-                        $jumlahSpp = (int)$result->spp;
+                        $jumlahSpp = $jumlahSpp;
                     }
                     // menghitung jumlah tagihan
                     $upSpp = $jumlahSpp;
@@ -485,10 +488,11 @@ class MengajarController extends Controller
             // cek apakah tagihan spp sudah ada?
             if ($tmpSpp) {
                 $keterangan = '';
-                $totalSPP = Mengajar::where('id_kelas', $result->id_kelas)
-                    ->whereMonth('created_at', Carbon::now()->format('m'))
-                    ->whereYear('created_at', Carbon::now()->format('Y'))
-                    ->sum('spp');
+                $totalSPP = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
+                    ->where('kelas.id_siswa', $idSiswa->id_siswa)
+                    ->whereMonth('mengajar.created_at', Carbon::now()->format('m'))
+                    ->whereYear('mengajar.created_at', Carbon::now()->format('Y'))
+                    ->sum('mengajar.spp');
                 // cek apakah ada referal
                 $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
                 $jumlahSpp =  (int)$totalSPP;
