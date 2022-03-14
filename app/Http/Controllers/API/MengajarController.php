@@ -339,7 +339,7 @@ class MengajarController extends Controller
                         $jumlahSpp = (int)$result->spp;
                     }
                     // menghitung jumlah tagihan
-                    $upSpp = (int)$tmpSpp->jumlah + $jumlahSpp;
+                    $upSpp = $jumlahSpp;
                     PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp, 'keterangan' => $keterangan]);
                 } else {
                     $reff = Referal::where('reff_id',  $idSiswa->id_siswa)->where('status', 'Aktif')->count();
