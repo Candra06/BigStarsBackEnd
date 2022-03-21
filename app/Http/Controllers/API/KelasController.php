@@ -175,7 +175,7 @@ class KelasController extends Controller
             }
             $result = $dt->get();
             // return $result;
-            
+
             foreach ($result as $key) {
                 $detail = DetailKelas::where('id_kelas', $key->id)->first();
                 $jumlahHari = DetailKelas::where('id_kelas', $key->id)->select('hari')->get();
@@ -424,6 +424,11 @@ class KelasController extends Controller
             $akses = '';
             if ($role == 'Guru') {
                 $id_guru = Guru::where('id_users', Auth::user()->id)->first();
+                $detailKelas = DetailKelas::where('id_kelas', $id)->select('hari')->get();
+                $day = Helper::getDay(Carbon::now()->format('l'));
+                // return $day;
+                // return $detailKelas;
+
                 $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
                     ->where('mengajar.id_guru', $id_guru->id)
@@ -433,12 +438,17 @@ class KelasController extends Controller
                 $kelas = Kelas::where('id', $id)->first();
 
                 if ($kelas->id_guru == $id_guru->id) {
-                    $akses = true;
+                    
+                    foreach ($detailKelas as  $value) {
+                        if ($day != $value->hari) {
+                            $akses = false;
+                        }else{
+                            $akses = true;
+                        }
+                    }
                 } else {
                     $akses = false;
                 }
-
-
             } else {
                 $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
@@ -450,7 +460,6 @@ class KelasController extends Controller
                 } else {
                     $akses = false;
                 }
-
             }
 
             $data['akses_add'] = $akses;
