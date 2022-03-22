@@ -424,10 +424,11 @@ class KelasController extends Controller
             $akses = '';
             if ($role == 'Guru') {
                 $id_guru = Guru::where('id_users', Auth::user()->id)->first();
-                $detailKelas = DetailKelas::where('id_kelas', $id)->select('hari')->get();
                 $day = Helper::getDay(Carbon::now()->format('l'));
+                $detailKelas = DetailKelas::where('id_kelas', $id)->where('hari', $day)->select('hari')->get();
                 // return $day;
-                // return $detailKelas;
+                // return $detailKelas; 
+
 
                 $tmpData = Mengajar::leftJoin('guru', 'guru.id', 'mengajar.id_guru')
                     ->where('mengajar.id_kelas', $id)
@@ -438,13 +439,11 @@ class KelasController extends Controller
                 $kelas = Kelas::where('id', $id)->first();
 
                 if ($kelas->id_guru == $id_guru->id) {
-                    
-                    foreach ($detailKelas as  $value) {
-                        if ($day != $value->hari) {
-                            $akses = false;
-                        }else{
-                            $akses = true;
-                        }
+
+                    if (count($detailKelas) > 0) {
+                        $akses = true;
+                    } else {
+                        $akses = false;
                     }
                 } else {
                     $akses = false;
@@ -464,6 +463,7 @@ class KelasController extends Controller
 
             $data['akses_add'] = $akses;
             $data['data'] = $tmpData;
+            // $data['data']['akses_add'] = $akses;
 
             return response()->json([
                 'status_code' => 200,
