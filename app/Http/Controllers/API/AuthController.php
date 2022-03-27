@@ -87,7 +87,7 @@ class AuthController extends Controller
                             ]);
                             NotifikasiDetail::create([
                                 'id_notif' => $not->id,
-                                'id_penerima' => $u->id_users,
+                                'id_penerima' => $u->id,
                                 'status' => 'Unread',
                                 'created_at' => Carbon::now(),
                                 'updated_at' => Carbon::now(),
