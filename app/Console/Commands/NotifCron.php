@@ -95,8 +95,8 @@ class NotifCron extends Command
             foreach ($user as $u) {
                 if ($u->id == $g->id_users) {
                     $not = Notifikasi::create([
-                        'judul' => 'Selamat ulang tahun ' . $u->nama,
-                        'konten' => 'Selamat ulang tahun ' . $u->nama . '. Semoga sehat selalu dan semua yang diinginkan dapat tercapai.',
+                        'judul' => 'Selamat ulang tahun ' . $g->nama,
+                        'konten' => 'Selamat ulang tahun ' . $g->nama . '. Semoga sehat selalu dan semua yang diinginkan dapat tercapai.',
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]);
