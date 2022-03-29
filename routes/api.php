@@ -22,6 +22,8 @@ Route::post('/importGuru', 'API\GuruController@import');
 Route::post('/importSiswa', 'API\SiswaController@import');
 Route::post('/importSiswaByWali', 'API\SiswaController@importByWali');
 Route::post('/importKelas', 'API\KelasController@import');
+Route::get('/generate-fee', 'API\PembayaranFeeController@create');
+Route::get('/generate-spp', 'API\PembayaranSppController@create');
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard-admin', 'API\AuthController@dashboardAdmin');
@@ -84,9 +86,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('finance')->group(function () {
         Route::get('/index', 'API\PembayaranSppController@indexFinance');
-        Route::get('/generate-fee', 'API\PembayaranFeeController@create');
+
         Route::get('/list-fee', 'API\PembayaranFeeController@index');
-        Route::get('/generate-spp', 'API\PembayaranSppController@create');
+
         Route::get('/list-spp', 'API\PembayaranSppController@index');
         Route::get('/detail-spp/{id}', 'API\PembayaranSppController@show');
         Route::get('/detail-fee/{id}', 'API\PembayaranFeeController@show');

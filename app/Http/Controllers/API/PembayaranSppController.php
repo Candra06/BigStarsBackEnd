@@ -138,8 +138,8 @@ class PembayaranSppController extends Controller
                 $absen['id_siswa'] = $key->id;
                 $absen['tagihan_bulan'] = Carbon::now()->format('Y-m-d');
                 $absen['status'] = 'Belum Lunas';
-                $absen['created_by'] = Auth::user()->id;
-                $absen['updated_by'] = Auth::user()->id;
+                $absen['created_by'] = 1;
+                $absen['updated_by'] = 1;
                 $absen['created_at'] = $now;
                 $absen['updated_at'] = $now;
                 PembayaranSPP::create($absen);

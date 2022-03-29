@@ -79,8 +79,8 @@ class PembayaranFeeController extends Controller
                 $absen['jumlah'] = 0;
                 $absen['tagihan_bulan'] = $now->format('Y-m-d');
                 $absen['status'] = 'Belum Lunas';
-                $absen['created_by'] = Auth::user()->id;
-                $absen['updated_by'] = Auth::user()->id;
+                $absen['created_by'] = 1;
+                $absen['updated_by'] = 1;
                 $absen['created_at'] = $now;
                 $absen['updated_at'] = $now;
                 PembayaranFEE::create($absen);
