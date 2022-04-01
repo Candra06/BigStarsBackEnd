@@ -89,19 +89,19 @@ class PembayaranSppController extends Controller
                         $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
                     }
                     $data = $query->get();
-                    return $data;
-                    $tmp['id_siswa'] = $data->id_siswa;
+                    // return $data;
+                    $tmp['id_siswa'] = $data['id_siswa'];
                     $tmp['nama'] = $id->nama;
-                    $tmp['id'] = $data->id;
-                    $tmp['no_invoice'] = $data->no_invoice;
-                    $tmp['tagihan_bulan'] = $data->tagihan_bulan;
-                    $tmp['jumlah'] = $data->jumlah;
-                    $tmp['status'] = $data->status;
-                    $tmp['keterangan'] = $data->keterangan;
-                    $tmp['created_by'] = $data->created_by;
-                    $tmp['updated_by'] = $data->updated_by;
-                    $tmp['created_at'] = $data->created_at;
-                    $tmp['updated_at'] = $data->updated_at;
+                    $tmp['id'] = $data['id'];
+                    $tmp['no_invoice'] = $data['no_invoice'];
+                    $tmp['tagihan_bulan'] = $data['tagihan_bulan'];
+                    $tmp['jumlah'] = $data['jumlah'];
+                    $tmp['status'] = $data['status'];
+                    $tmp['keterangan'] = $data['keterangan'];
+                    $tmp['created_by'] = $data['created_by'];
+                    $tmp['updated_by'] = $data['updated_by'];
+                    $tmp['created_at'] = $data['created_at'];
+                    $tmp['updated_at'] = $data['updated_at'];
 
                     array_push($result, $tmp);
                 }
