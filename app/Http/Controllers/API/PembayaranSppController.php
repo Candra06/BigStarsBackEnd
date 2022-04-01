@@ -90,14 +90,14 @@ class PembayaranSppController extends Controller
                         $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
                     }
                     $data = $query->get();
-                    
+
                     array_push($result, $data);
                 }
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success',
                     // 'query' => $q,
-                    'data' => $result,
+                    'data' => $data,
                 ]);
             } else {
                 $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
