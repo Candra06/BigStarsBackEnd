@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', 'API\AuthController@login');
+Route::post('/cekPassword', 'API\AuthController@cekPassword');
 Route::get('/notif', 'API\AuthController@notif');
 Route::post('/lupa-password', 'API\AuthController@forgotPassword');
 Route::post('/reset-password', 'API\AuthController@resetPassword');

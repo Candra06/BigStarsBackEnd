@@ -77,11 +77,28 @@ class PembayaranSppController extends Controller
                 $idWali = Walimurid::where('id_users', Auth::user()->id)->first();
                 $idSiswa = Siswa::where('id_wali', $idWali->id)->get();
                 // return $idSiswa;
+                $result = [];
                 foreach ($idSiswa as $id) {
                     $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                         ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
                         ->where('id_siswa', $id->id);
+                    if ($request->bulan) {
+                        $query = $query->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
+                    }
+
+                    if ($request->tahun) {
+                        $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
+                    }
+                    $data = $query->get();
+                    
+                    array_push($result, $data);
                 }
+                return response()->json([
+                    'status_code' => 200,
+                    'message' => 'Success',
+                    // 'query' => $q,
+                    'data' => $result,
+                ]);
             } else {
                 $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
                     ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*');

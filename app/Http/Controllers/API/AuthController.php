@@ -26,6 +26,10 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function cekPassword(Request $request)
+    {
+        return bcrypt($request->password);
+    }
     public function notif()
     {
         try {
