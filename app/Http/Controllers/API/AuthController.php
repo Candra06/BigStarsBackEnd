@@ -28,6 +28,8 @@ class AuthController extends Controller
 {
     public function cekPassword(Request $request)
     {
+        $created = $request->tglKelas . ' ' . date('H:i:s');
+        return date('Y', strtotime($created));
         return bcrypt($request->password);
     }
     public function notif()

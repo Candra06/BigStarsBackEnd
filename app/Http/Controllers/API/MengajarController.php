@@ -476,11 +476,11 @@ class MengajarController extends Controller
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
 
             // get data tagihan
-            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))
-                ->whereYear('created_at', Carbon::now()->format('Y'))
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', date('m', strtotime($created)))
+                ->whereYear('created_at', date('Y', strtotime($created)))
                 ->where('id_siswa', $idSiswa->id_siswa)->first();
-            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))
-                ->whereYear('created_at', Carbon::now()->format('Y'))
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', date('m', strtotime($created)))
+                ->whereYear('created_at', date('Y', strtotime($created)))
                 ->where('id_guru', $result->id_guru)->first();
 
 
