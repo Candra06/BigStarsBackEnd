@@ -89,6 +89,7 @@ class PembayaranSppController extends Controller
                         $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
                     }
                     $data = $query->get();
+                    return $data;
                     $tmp['id_siswa'] = $data->id_siswa;
                     $tmp['nama'] = $id->nama;
                     $tmp['id'] = $data->id;
