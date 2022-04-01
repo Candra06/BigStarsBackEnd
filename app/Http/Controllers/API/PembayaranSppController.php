@@ -90,20 +90,21 @@ class PembayaranSppController extends Controller
                     }
                     $data = $query->get();
                     // return $data;
-                    $tmp['id_siswa'] = $data['id_siswa'];
-                    $tmp['nama'] = $id->nama;
-                    $tmp['id'] = $data['id'];
-                    $tmp['no_invoice'] = $data['no_invoice'];
-                    $tmp['tagihan_bulan'] = $data['tagihan_bulan'];
-                    $tmp['jumlah'] = $data['jumlah'];
-                    $tmp['status'] = $data['status'];
-                    $tmp['keterangan'] = $data['keterangan'];
-                    $tmp['created_by'] = $data['created_by'];
-                    $tmp['updated_by'] = $data['updated_by'];
-                    $tmp['created_at'] = $data['created_at'];
-                    $tmp['updated_at'] = $data['updated_at'];
-
-                    array_push($result, $tmp);
+                    foreach ($data as $dt) {
+                        $tmp['id_siswa'] = $dt->id_siswa;
+                        $tmp['nama'] = $id->nama;
+                        $tmp['id'] = $dt->id;
+                        $tmp['no_invoice'] = $dt->no_invoice;
+                        $tmp['tagihan_bulan'] = $dt->tagihan_bulan;
+                        $tmp['jumlah'] = $dt->jumlah;
+                        $tmp['status'] = $dt->status;
+                        $tmp['keterangan'] = $dt->keterangan;
+                        $tmp['created_by'] = $dt->created_by;
+                        $tmp['updated_by'] = $dt->updated_by;
+                        $tmp['created_at'] = $dt->created_at;
+                        $tmp['updated_at'] = $dt->updated_at;
+                        array_push($result, $tmp);
+                    }
                 }
                 return response()->json([
                     'status_code' => 200,
