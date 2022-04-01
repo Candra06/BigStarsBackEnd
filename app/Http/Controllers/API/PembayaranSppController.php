@@ -79,8 +79,7 @@ class PembayaranSppController extends Controller
                 // return $idSiswa;
                 $result = [];
                 foreach ($idSiswa as $id) {
-                    $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
-                        ->select('siswa.id as id_siswa', 'siswa.nama', 'pembayaran_spp.*')
+                    $query = PembayaranSPP::select('*')
                         ->where('id_siswa', $id->id);
                     if ($request->bulan) {
                         $query = $query->whereMonth('pembayaran_spp.tagihan_bulan',  $request->bulan);
@@ -90,14 +89,26 @@ class PembayaranSppController extends Controller
                         $query = $query->whereYear('pembayaran_spp.tagihan_bulan',  $request->tahun);
                     }
                     $data = $query->get();
+                    $tmp['id_siswa'] = $data->id_siswa;
+                    $tmp['nama'] = $id->nama;
+                    $tmp['id'] = $data->id;
+                    $tmp['no_invoice'] = $data->no_invoice;
+                    $tmp['tagihan_bulan'] = $data->tagihan_bulan;
+                    $tmp['jumlah'] = $data->jumlah;
+                    $tmp['status'] = $data->status;
+                    $tmp['keterangan'] = $data->keterangan;
+                    $tmp['created_by'] = $data->created_by;
+                    $tmp['updated_by'] = $data->updated_by;
+                    $tmp['created_at'] = $data->created_at;
+                    $tmp['updated_at'] = $data->updated_at;
 
-                    array_push($result, $data);
+                    array_push($result, $tmp);
                 }
                 return response()->json([
                     'status_code' => 200,
                     'message' => 'Success',
                     // 'query' => $q,
-                    'data' => $data,
+                    'data' => $result,
                 ]);
             } else {
                 $query = PembayaranSPP::leftJoin('siswa', 'siswa.id', 'pembayaran_spp.id_siswa')
