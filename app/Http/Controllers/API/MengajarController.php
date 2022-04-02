@@ -575,9 +575,11 @@ class MengajarController extends Controller
     {
         try {
             $result = Mengajar::where('id', $id)->first();
+            // return $result->created_at;
             $idSiswa = Kelas::where('id', $result->id_kelas)->first();
-            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_siswa', $idSiswa->id_siswa)->first();
-            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', Carbon::now()->format('m'))->where('id_guru', $result->id_guru)->first();
+            $tmpSpp =  PembayaranSPP::whereMonth('tagihan_bulan', date('m', strtotime($result->created_at)))->where('id_siswa', $idSiswa->id_siswa)->first();
+            $tmpFee =  PembayaranFEE::whereMonth('tagihan_bulan', date('m', strtotime($result->created_at)))->where('id_guru', $result->id_guru)->first();
+            
             $upSpp = (int)$tmpSpp->jumlah - (int)$result->spp;
             $upFee = (int)$tmpFee->jumlah - (int)$result->fee_pengajar;
             PembayaranSPP::where('id', $tmpSpp->id)->update(['jumlah' => $upSpp]);
