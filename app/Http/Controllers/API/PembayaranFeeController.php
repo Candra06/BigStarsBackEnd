@@ -300,10 +300,9 @@ class PembayaranFeeController extends Controller
     public function show($id)
     {
         try {
+
             $detail = PembayaranFEE::leftJoin('guru', 'guru.id', 'pembayaran_fee.id_guru')
                 ->select('guru.nama', 'pembayaran_fee.*')->where('pembayaran_fee.id', $id)->first();
-            $total = Mengajar::where('id_guru', $detail->id_guru)->count();
-
             $month = explode('-', $detail->tagihan_bulan);
             $bulan = intval($month[1]);
             $year = intval($month[0]);
@@ -315,6 +314,8 @@ class PembayaranFeeController extends Controller
             } else {
                 $b = $b;
             }
+            $total = Mengajar::where('id_guru', $detail->id_guru)->whereMonth('created_at', $b)
+                ->whereYear('created_at', $y)->count();
 
             $list = Mengajar::leftJoin('kelas', 'kelas.id', 'mengajar.id_kelas')
                 ->leftJoin('siswa', 'siswa.id', 'kelas.id_siswa')
