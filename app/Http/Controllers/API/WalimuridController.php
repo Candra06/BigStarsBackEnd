@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Referal;
 use App\Siswa;
 use App\User;
 use App\Walimurid;
@@ -90,7 +91,17 @@ class WalimuridController extends Controller
             $siswa['birth_date'] = $request->birth_date;
             $siswa['kode_referal'] =  'BS'.Helper::generateRandomString(5);
             $siswa['status'] = 'Aktif';
-            Siswa::create($siswa);
+
+            $inputSiswa = Siswa::create($siswa);
+            if ($request->kode_referal) {
+                $from = Siswa::where('kode_referal', $request->kode_referal)->first();
+                $reff['reff_id'] = $from->id;
+                $reff['id_siswa'] = $inputSiswa->id;
+                $reff['status'] = 'Aktif';
+                $reff['created_at'] = Carbon::now();
+                $reff['updated_at'] = Carbon::now();
+                Referal::create($reff);
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Success',
