@@ -187,6 +187,7 @@ class AuthController extends Controller
                 throw new \Exception('Error in Login');
             }
         } catch (Exception $error) {
+            return $error;
             return response()->json([
                 'status_code' => 500,
                 'message' => 'Error in Login',
